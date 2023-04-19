@@ -6,6 +6,13 @@ on:
       - src/**
       - .github/workflows/build-push.yml
 
+env:
+  dh_user: 'kshino'
+  image: 'apex-clipper'
+  tag_basename: 'm1'
+  context: 'src'
+  dockerfile: 'src/docker/Dockerfile'
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -25,6 +32,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: kshino/apex-clipper:m1,kshino/apex-clipper:m1-${{github.sha}}
-          context: src
-          file: src/docker/Dockerfile
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename}}-${{github.sha}}
+          context: ${{env.context}}
+          file: ${{env.dockerfile}}
