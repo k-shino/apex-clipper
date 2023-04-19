@@ -10,20 +10,26 @@ RUN pip install pytesseract
 RUN apt-get update && apt-get install -y \
       wget \
       xz-utils \
-      bc
+      bc \
+      unzip
 RUN apt-get install -y libgl1-mesa-dev \
       tesseract-ocr \
       libtesseract-dev
 
 WORKDIR /tmp
-#RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
-#      && tar Jxvf ./ffmpeg-release-amd64-static.tar.xz \
-#      && cp ./ffmpeg-4.4.1-amd64-static/ffmpeg /usr/local/bin/
+RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
+     && tar Jxvf ./ffmpeg-release-amd64-static.tar.xz
 
-#RUN cp ./ffmpeg-4.4.1-amd64-static/qt-faststart /usr/local/bin/
+RUN cp ./ffmpeg-6.0-amd64-static/qt-faststart /usr/local/bin/ \
+      && cp ./ffmpeg-6.0-amd64-static/ffmpeg /usr/local/bin/
 RUN pip install pandas
 
 RUN wget -O /usr/share/tesseract-ocr/4.00/tessdata/jpn.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/jpn.traineddata
+
+
+# RUN wget -O /tmp/ffmpeg.zip https://www.osxexperts.net/ffmpeg6arm.zip
+# RUN wget -O /tmp/ffmpeg.zip https://www.osxexperts.net/ffmpeg6intel.zip 
+# RUN unzip /tmp/ffmpeg.zip -d /bin/
 
 ADD ./model/ /root/model/
 ADD ./apex-tracker.py /root/
