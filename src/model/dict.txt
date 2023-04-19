@@ -1,0 +1,8 @@
+0:result
+1:memberlist
+2:deathprotection
+3:other
+4:enemy
+5:death
+6:map
+7:lobby

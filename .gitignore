@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.DS_Store
+
+test/ocr
+test/out
+test/work
+test/apex_kill_clip
