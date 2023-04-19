@@ -2,6 +2,9 @@ name: build container
 
 on:
   push:
+    paths:
+      - src/**
+      - .github/workflows/build-push.yml
 
 jobs:
   docker:
@@ -25,5 +28,5 @@ jobs:
         with:
           push: true
           tags: kshino/apex-clipper:test
-          context: ./src
-          file: ./docker/Dockerfile
+          context: src
+          file: src/docker/Dockerfile
