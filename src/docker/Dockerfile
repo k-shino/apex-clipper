@@ -15,12 +15,14 @@ RUN wget -O /jpn.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/
 RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
      && tar Jxvf ./ffmpeg-release-amd64-static.tar.xz
 
-FROM python:3.8
+FROM python:3.8-slim
 
 RUN pip install --upgrade pip
-COPY requirements.txt /tmp/
+COPY requirements.txt /root/
 RUN pip install --upgrade pip
-RUN pip install -r /tmp/requirements.txt
+RUN pip install -r /root/requirements.txt \
+      && rm -rf /root/.cache/pip
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=0 /jpn.traineddata /usr/share/tesseract-ocr/4.00/tessdata/jpn.traineddata
 COPY --from=0 /ffmpeg-6.0-amd64-static/qt-faststart /usr/local/bin/
