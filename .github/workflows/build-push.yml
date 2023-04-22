@@ -33,5 +33,6 @@ jobs:
         with:
           push: true
           tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename}}-${{github.sha}}
+          platforms: linux/amd64,linux/arm64
           context: ${{env.context}}
           file: ${{env.dockerfile}}
