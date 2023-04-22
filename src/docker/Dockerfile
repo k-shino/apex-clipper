@@ -2,7 +2,17 @@ FROM python:3.8
 
 RUN pip install --upgrade pip
 COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
+# RUN pip install -r /tmp/requirements.txt
+RUN pip install --upgrade pip
+RUN pip install opencv-python
+#RUN pip install tensorflow
+RUN pip install tqdm
+RUN pip install pillow
+RUN pip install pyocr
+RUN pip install pytesseract
+RUN pip install pandas
+
+RUN pip freeze
 
 RUN apt-get update && apt-get install -y \
       wget \
