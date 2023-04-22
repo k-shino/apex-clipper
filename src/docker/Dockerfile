@@ -1,15 +1,11 @@
-FROM python:3.8
+FROM python:3.8-slim
 
 RUN pwd
 
 RUN apt-get update && apt-get install -y \
       wget \
       xz-utils \
-      bc \
       unzip
-RUN apt-get install -y libgl1-mesa-dev \
-      tesseract-ocr \
-      libtesseract-dev
 
 RUN wget -O /jpn.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/jpn.traineddata
 RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
@@ -22,6 +18,12 @@ COPY requirements.txt /root/
 RUN pip install --upgrade pip
 RUN pip install -r /root/requirements.txt \
       && rm -rf /root/.cache/pip
+
+RUN apt-get update && apt-get install -y \
+      libgl1-mesa-dev \
+      tesseract-ocr \
+      libtesseract-dev \
+      bc
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=0 /jpn.traineddata /usr/share/tesseract-ocr/4.00/tessdata/jpn.traineddata
@@ -47,4 +49,4 @@ ADD ./add_battle_result.sh /root/
 # ADD ./ocr/jpn.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
 #ADD ./docker/ffmpeg /usr/local/bin/
 
-# ENTRYPOINT ["/root/bootstrap.sh"]
+ENTRYPOINT ["/root/bootstrap.sh"]
