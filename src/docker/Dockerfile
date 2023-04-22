@@ -22,7 +22,6 @@ COPY requirements.txt /tmp/
 RUN pip install --upgrade pip
 RUN pip install -r /tmp/requirements.txt
 
-COPY --from=0 /go/src/github.com/alexellis/href-counter/app ./
 COPY --from=0 /jpn.traineddata /usr/share/tesseract-ocr/4.00/tessdata/jpn.traineddata
 COPY --from=0 /ffmpeg-6.0-amd64-static/qt-faststart /usr/local/bin/
 COPY --from=0 /ffmpeg-6.0-amd64-static/ffmpeg /usr/local/bin/
