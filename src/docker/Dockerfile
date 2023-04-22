@@ -1,12 +1,9 @@
 FROM python:3.8
 
 RUN pip install --upgrade pip
-RUN pip install opencv-python
-#RUN pip install tensorflow
-RUN pip install tqdm
-RUN pip install pillow
-RUN pip install pyocr
-RUN pip install pytesseract
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
+
 RUN apt-get update && apt-get install -y \
       wget \
       xz-utils \
@@ -15,6 +12,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y libgl1-mesa-dev \
       tesseract-ocr \
       libtesseract-dev
+
+RUN rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
 RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
