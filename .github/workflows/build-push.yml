@@ -82,7 +82,7 @@ jobs:
       - name: test
         run: |
           cd test
-          ./test.sh
+          ./test-ocr.sh
       - name: save ocr artifact
         uses: actions/upload-artifact@v3
         with:
