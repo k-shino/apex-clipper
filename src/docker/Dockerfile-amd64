@@ -8,8 +8,13 @@ RUN apt-get update && apt-get install -y \
       unzip
 
 RUN wget -O /jpn.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/jpn.traineddata
+
+
 RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
      && tar Jxvf ./ffmpeg-release-amd64-static.tar.xz
+
+# RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-arm64-static.tar.xz \
+#      && tar Jxvf ./ffmpeg-release-arm64-static.tar.xz
 
 FROM python:3.8-slim
 
@@ -30,6 +35,9 @@ COPY --from=0 /jpn.traineddata /usr/share/tesseract-ocr/4.00/tessdata/jpn.traine
 COPY --from=0 /ffmpeg-6.0-amd64-static/qt-faststart /usr/local/bin/
 COPY --from=0 /ffmpeg-6.0-amd64-static/ffmpeg /usr/local/bin/
 
+# COPY --from=0 /ffmpeg-6.0-arm64-static/qt-faststart /usr/local/bin/
+# COPY --from=0 /ffmpeg-6.0-arm64-static/ffmpeg /usr/local/bin/
+
 WORKDIR /tmp
 
 # RUN wget -O /tmp/ffmpeg.zip https://www.osxexperts.net/ffmpeg6arm.zip
@@ -49,4 +57,4 @@ ADD ./add_battle_result.sh /root/
 # ADD ./ocr/jpn.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
 #ADD ./docker/ffmpeg /usr/local/bin/
 
-ENTRYPOINT ["/root/bootstrap.sh"]
+# ENTRYPOINT ["/root/bootstrap.sh"]
