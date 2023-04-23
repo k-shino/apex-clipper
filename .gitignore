@@ -130,7 +130,7 @@ dmypy.json
 
 .DS_Store
 
-test/ocr
+# test/ocr
 test/out
 test/work
 test/apex_kill_clip
