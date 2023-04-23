@@ -71,7 +71,9 @@ jobs:
           lfs: true
       - name: customize imagetag
         run: |
-          sed -i -e 's#<image-tag>#${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}#' ./test/apex_tracker.yml
+          set -x
+          sed -i -e 's#<image-tag>#${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}#' ./test/apex_tracker.yml
+          cat ./test/apex_tracker.yml
       - name: test
         run: |
           cd test
