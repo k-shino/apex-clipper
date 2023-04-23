@@ -9,7 +9,8 @@ on:
 env:
   dh_user: 'kshino'
   image: 'apex-clipper'
-  tag_basename: 'm1'
+  tag_basename_arm64: 'm1'
+  tag_basename_amd64: 'amd64'
   context: 'src'
   dockerfile_arm64: 'src/docker/Dockerfile-arm64'
   dockerfile_amd64: 'src/docker/Dockerfile-amd64'
@@ -33,7 +34,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename}}-${{github.sha}}
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}
           platforms: linux/amd64
           context: ${{env.context}}
           file: ${{env.dockerfile_amd64}}
@@ -55,7 +56,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename}}-${{github.sha}}
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}
           platforms: linux/arm64
           context: ${{env.context}}
           file: ${{env.dockerfile_arm64}}
