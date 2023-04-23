@@ -5,6 +5,7 @@ on:
     paths:
       - src/**
       - .github/workflows/build-push.yml
+      - test/**
 
 env:
   dh_user: 'kshino'
