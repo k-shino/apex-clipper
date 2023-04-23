@@ -70,8 +70,23 @@ jobs:
           lfs: true
       - name: customize imagetag
         run: |
-          sed -i -e 's/<image-tag>/${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}/' ./test/apex_tracker.yml
+          sed -i -e 's#<image-tag>#${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}#' ./test/apex_tracker.yml
       - name: test
         run: |
           cd test
           ./test.sh
+      - name: save ocr artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ocr-result
+          path: |
+            test/ocr/*/cut_time_battle.csv
+          retention-days: 1
+      - name: save output artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: result movie
+          path: |
+            test/work/*/create_match_clip.log
+            test/out/*.mp4
+          retention-days: 1
