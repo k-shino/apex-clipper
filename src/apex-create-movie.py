@@ -72,7 +72,7 @@ cont_duration = 60
 # 特徴点より設定秒数だけ前から録画を開始
 before_scene_sec = 3
 
-print("apex-create-movie.py with option: ",args)
+print("    apex-create-movie.py with option: ",args)
 
 scenedef=['result','memberlist','deathprotection','other','enemy','death','map']
 
@@ -156,7 +156,8 @@ with open(battle_write_log_path, mode='w') as logfile:
                             log = "  [DEBUG] ffmpeg command: %s" % (command)
                             print(log)
                             logfile.write(log+'\n')
-                            subprocess.run(command, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
+                            subprocess.run(command, shell=True)
+                            # subprocess.run(command, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
                             subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
 
                         if int(scene[i]) == 5 or int(scene[i]) == 0:
