@@ -2,12 +2,12 @@
 
 set -eux
 
-cd ../src
+# cd ../src
 
-# docker build -f ./docker/Dockerfile -t kshino/apex-clipper:m1 .
-# docker push kshino/apex-clipper:m1
+# # docker build -f ./docker/Dockerfile -t kshino/apex-clipper:m1 .
+# # docker push kshino/apex-clipper:m1
 
-cd ../test
+# cd ../test
 
 # # ocr
 rm -rf ocr

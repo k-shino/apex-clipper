@@ -7,7 +7,7 @@ services:
       - ./ocr:/root/ocr
       - ./work:/root/work
       - ./apex_kill_clip:/root/apex_kill_clip
-    image: kshino/apex-clipper:m1-6fc640f94f62952644e261e558fd842b70cd24a0
+    image: <image-tag>
     entrypoint: ["/root/bootstrap.sh","-m","all"]
     deploy:
       mode: replicated
