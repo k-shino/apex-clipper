@@ -66,6 +66,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          lfs: true
       - name: customize imagetag
         run: |
           sed -i -e 's/<image-tag>/${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}/' ./test/apex_tracker.yml
