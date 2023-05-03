@@ -22,7 +22,7 @@ export MOVIE_DIR_LIST=$(ls $SRC_MOVIE_PATH | sort -R)
 
 #############################
 PROGNAME=$(basename "$0")
-VERSION="3.12"
+VERSION=${VERSION:-"3.12"}
 #############################
 
 usage() {
