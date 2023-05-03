@@ -26,7 +26,7 @@ jobs:
       - name: customize version
         run: |
           set -x
-          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/Dockerfile-amd64
+          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/docker/Dockerfile-amd64
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -52,7 +52,7 @@ jobs:
       - name: customize version
         run: |
           set -x
-          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/Dockerfile-arm64
+          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/docker/Dockerfile-arm64
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
