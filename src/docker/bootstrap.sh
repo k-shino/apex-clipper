@@ -147,13 +147,13 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
         echo "MOVIE_DIR: $SRC_MOVIE_PATH/$MOVIE_DIR:"
         ls "$SRC_MOVIE_PATH/$MOVIE_DIR"
         if "$REVERT"; then
-            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '20*.m*' | sort -r)
+            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '*.m*' | sort -r)
         else
-            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '20*.m*' | sort -R)
+            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '*.m*' | sort -R)
         fi
         echo "list:"
-        echo $list
-        for movie_file in $list
+        echo "$list"
+        while read -r movie_file
         do
             echo "  Start OCR $movie_file : "
             dir=$(basename "$movie_file" | awk -F. '{print $1}')
@@ -201,7 +201,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
             else
                 echo "    Skip OCR ${OCR_PATH}/${dir}"
             fi
-        done
+        done < <(echo "$list")
     done
 fi
 
