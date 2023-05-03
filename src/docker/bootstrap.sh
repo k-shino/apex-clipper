@@ -18,10 +18,10 @@ export DEBUG_MODE=false
 
 export REVERT=false
 
-export MOVIE_DIR_LIST=`ls $SRC_MOVIE_PATH | sort -R`
+export MOVIE_DIR_LIST=$(ls $SRC_MOVIE_PATH | sort -R)
 
 #############################
-PROGNAME=$(basename $0)
+PROGNAME=$(basename "$0")
 VERSION="3.11"
 #############################
 
@@ -40,7 +40,6 @@ do
     case "$OPT" in
         '-h'|'--help' )
             usage
-            exit 1
             ;;
         '--version' )
             echo $VERSION
@@ -117,65 +116,65 @@ echo "  MODE: $MODE"
 echo " "
 echo "Check files:"
 echo "  SRC_MOVIE:"
-ls -C $SRC_MOVIE_PATH
+ls -C "$SRC_MOVIE_PATH"
 echo " "
 echo "  OUT_PATH:"
-ls -C $OUT_PATH
+ls -C "$OUT_PATH"
 echo " "
 echo "  OCR_PATH:"
-ls -C $OCR_PATH
+ls -C "$OCR_PATH"
 echo " "
 echo "  WORK_PATH:"
-ls -C $WORK_PATH
+ls -C "$WORK_PATH"
 echo " "
 if ! "$DEBUG_MODE"; then
-    sec=$(($RANDOM % 100))
+    sec=$((RANDOM % 100))
     echo "Sleep $sec sec..."
     sleep $sec
 else
-    sec=$(($RANDOM % 10))
+    sec=$((RANDOM % 10))
     echo "Sleep $sec sec..."
     sleep $sec
 fi
 
 # OCRの実行
-if [ $MODE == 'all' -o $MODE == 'ocr' ]; then
+if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
     echo "---------------------------------------------------"
     echo "OCR phase"
     echo "---------------------------------------------------"
     for MOVIE_DIR in ${MOVIE_DIR_LIST}
     do
         echo "MOVIE_DIR: $SRC_MOVIE_PATH/$MOVIE_DIR:"
-        ls $SRC_MOVIE_PATH/$MOVIE_DIR
+        ls "$SRC_MOVIE_PATH/$MOVIE_DIR"
         if "$REVERT"; then
-            list=`find $SRC_MOVIE_PATH/$MOVIE_DIR -name '20*.m*' | sort -r`
+            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '20*.m*' | sort -r)
         else
-            list=`find $SRC_MOVIE_PATH/$MOVIE_DIR -name '20*.m*' | sort -R`
+            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '20*.m*' | sort -R)
         fi
         echo "list:"
         echo $list
         for movie_file in $list
         do
             echo "  Start OCR $movie_file : "
-            dir=`basename $movie_file | awk -F. '{print $1}'`
-            mkdir -p ${OCR_PATH}/${dir}
+            dir=$(basename "$movie_file" | awk -F. '{print $1}')
+            mkdir -p "${OCR_PATH}/${dir}"
             flg_ocr_in_progress=${OCR_PATH}/${dir}/flg_in_progress
 
             if "$FORCE_PARAM"; then
-                if [ -f ${OCR_PATH}/${dir}/${FINISH_FLG} ]; then
-                    if [ "`cat ${OCR_PATH}/${dir}/${FINISH_FLG}`" != "$VERSION" ]; then
+                if [ -f "${OCR_PATH}/${dir}/${FINISH_FLG}" ]; then
+                    if [ "$(cat "${OCR_PATH}/${dir}/${FINISH_FLG}")" != "$VERSION" ]; then
                         echo "Force OCR: ${OCR_PATH}/${dir}"
-                        rm -f ${OCR_PATH}/${dir}/${FINISH_FLG}
+                        rm -f "${OCR_PATH}/${dir}/${FINISH_FLG}"
                     fi
                 fi
             fi
 
-            if [ ! -f ${OCR_PATH}/${dir}/${FINISH_FLG} ]; then
-                if [ ! -f ${flg_ocr_in_progress} ]; then
+            if [ ! -f "${OCR_PATH}/${dir}/${FINISH_FLG}" ]; then
+                if [ ! -f "${flg_ocr_in_progress}" ]; then
                     # rm -rf ${OCR_PATH}/${dir}/match*/
-                    rm -f ${OCR_PATH}/${dir}/flg_*
-                    rm -f ${OCR_PATH}/${dir}/*flg*
-                    touch $flg_ocr_in_progress
+                    rm -f "${OCR_PATH}/${dir}"/flg_*
+                    rm -f "${OCR_PATH}/${dir}"/*flg*
+                    touch "$flg_ocr_in_progress"
 
                     EXEC_OCR='python3 /root/apex-ocr.py -o ${OCR_PATH}'
                     unset $EXEC_ARGS
@@ -191,10 +190,10 @@ if [ $MODE == 'all' -o $MODE == 'ocr' ]; then
                     echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
                     eval $EXEC_OCR $EXEC_ARGS ${movie_file}
 
-                    if [ -s ${OCR_PATH}/${dir}/${csv_file} ]; then
-                        echo $VERSION > ${OCR_PATH}/${dir}/${FINISH_FLG}
+                    if [ -s "${OCR_PATH}/${dir}/${csv_file}" ]; then
+                        echo $VERSION > "${OCR_PATH}/${dir}/${FINISH_FLG}"
                         echo "    Finish OCR ${OCR_PATH}/${dir}"
-                        rm -f $flg_ocr_in_progress
+                        rm -f "$flg_ocr_in_progress"
                     fi
                 else
                     echo "    Another OCR process running for ${OCR_PATH}/${dir} (work_in_progress flag)"
