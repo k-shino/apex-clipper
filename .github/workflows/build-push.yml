@@ -96,8 +96,7 @@ jobs:
           cat ./test/apex_tracker.yml
       - name: test
         run: |
-          cd test
-          ./test-ocr.sh
+          docker-compose -f ./test/apex_tracker.yml
       - name: save ocr artifact
         uses: actions/upload-artifact@v3
         with:
@@ -140,8 +139,7 @@ jobs:
           cat ./test/apex_tracker.yml
       - name: test
         run: |
-          cd test
-          ./test-clip.sh
+          docker-compose -f ./test/apex_tracker.yml
       # - name: save ocr artifact
       #   uses: actions/upload-artifact@v3
       #   with:
