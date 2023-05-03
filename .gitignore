@@ -134,3 +134,5 @@ dmypy.json
 test/out
 test/work
 test/apex_kill_clip
+test/ocr
+
