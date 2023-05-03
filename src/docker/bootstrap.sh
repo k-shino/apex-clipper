@@ -150,9 +150,9 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
         echo "MOVIE_DIR: $SRC_MOVIE_PATH/$MOVIE_DIR:"
         ls "$SRC_MOVIE_PATH/$MOVIE_DIR"
         if "$REVERT"; then
-            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '*.m*' | sort -r)
+            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '*.mp4' -o '*.mkv' | sort -r)
         else
-            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '*.m*' | sort -R)
+            list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name '*.mp4' -o '*.mkv' | sort -R)
         fi
         echo "list:"
         echo "$list"
