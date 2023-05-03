@@ -115,18 +115,21 @@ echo "Envirionment:"
 echo "  MODE: $MODE"
 echo " "
 echo "Check files:"
-echo "  SRC_MOVIE:"
+echo -n "  SRC_MOVIE:"
 ls -C "$SRC_MOVIE_PATH"
-echo " "
-echo "  OUT_PATH:"
-ls -C "$OUT_PATH"
-echo " "
-echo "  OCR_PATH:"
-ls -C "$OCR_PATH"
-echo " "
-echo "  WORK_PATH:"
-ls -C "$WORK_PATH"
-echo " "
+echo "  -----------"
+echo -n "  OUT_PATH:"
+echo "$OUT_PATH"
+ls -al "$OUT_PATH"
+echo "  -----------"
+echo -n "  OCR_PATH:"
+echo "$OCR_PATH"
+ls -al "$OCR_PATH"
+echo "  -----------"
+echo -n "  WORK_PATH:"
+echo "$WORK_PATH"
+ls -al "$WORK_PATH"
+echo "  -----------"
 if ! "$DEBUG_MODE"; then
     sec=$((RANDOM % 100))
     echo "Sleep $sec sec..."
@@ -176,7 +179,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
                     rm -f "${OCR_PATH}/${dir}"/*flg*
                     touch "$flg_ocr_in_progress"
 
-                    EXEC_OCR='python3 /root/apex-ocr.py -o ${OCR_PATH}'
+                    EXEC_OCR="python3 /root/apex-ocr.py -o \"${OCR_PATH}\""
                     unset $EXEC_ARGS
 
                     if [ -n "$SKIP" ]; then
@@ -188,7 +191,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
                     fi
 
                     echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
-                    eval $EXEC_OCR $EXEC_ARGS ${movie_file}
+                    eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\""
 
                     if [ -s "${OCR_PATH}/${dir}/${csv_file}" ]; then
                         echo $VERSION > "${OCR_PATH}/${dir}/${FINISH_FLG}"
