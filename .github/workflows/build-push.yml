@@ -61,7 +61,7 @@ jobs:
           platforms: linux/arm64
           context: ${{env.context}}
           file: ${{env.dockerfile_arm64}}
-  test-amd64:
+  test-amd64-ocr:
     runs-on: ubuntu-latest
     needs: build-amd64
     steps:
@@ -69,6 +69,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           lfs: true
+      - name: customize mode
+        run: |
+          set -x
+          sed -i -e 's#<mode>#ocr#' ./test/apex_tracker.yml
+          cat ./test/apex_tracker.yml
       - name: customize imagetag
         run: |
           set -x
@@ -77,7 +82,7 @@ jobs:
       - name: test
         run: |
           cd test
-          ./test.sh
+          ./test-ocr.sh
       - name: save ocr artifact
         uses: actions/upload-artifact@v3
         with:
@@ -85,6 +90,44 @@ jobs:
           path: |
             test/ocr/*/cut_time_battle.csv
           retention-days: 1
+      # - name: save output artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: result movie
+      #     path: |
+      #       test/work/*/create_match_clip.log
+      #       test/out/*.mp4
+      #       test/apex_kill_clip/*.mp4
+      #     retention-days: 1
+  test-amd64-ffmpeg:
+    runs-on: ubuntu-latest
+    needs: build-amd64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: customize mode
+        run: |
+          set -x
+          sed -i -e 's#<mode>#match_clip#' ./test/apex_tracker.yml
+          cat ./test/apex_tracker.yml
+      - name: customize imagetag
+        run: |
+          set -x
+          sed -i -e 's#<image-tag>#${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}#' ./test/apex_tracker.yml
+          cat ./test/apex_tracker.yml
+      - name: test
+        run: |
+          cd test
+          ./test-clip.sh
+      # - name: save ocr artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ocr-result
+      #     path: |
+      #       test/ocr/*/cut_time_battle.csv
+      #     retention-days: 1
       - name: save output artifact
         uses: actions/upload-artifact@v3
         with:
