@@ -15,6 +15,7 @@ env:
   context: 'src'
   dockerfile_arm64: 'src/docker/Dockerfile-arm64'
   dockerfile_amd64: 'src/docker/Dockerfile-amd64'
+  version: '3.12'
 
 jobs:
   build-amd64:
@@ -22,6 +23,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: customize version
+        run: |
+          set -x
+          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/Dockerfile-amd64
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -44,6 +49,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: customize version
+        run: |
+          set -x
+          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/Dockerfile-arm64
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
