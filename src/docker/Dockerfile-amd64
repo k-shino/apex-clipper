@@ -58,3 +58,4 @@ ADD ./add_battle_result.sh /root/
 #ADD ./docker/ffmpeg /usr/local/bin/
 
 # ENTRYPOINT ["/root/bootstrap.sh"]
+ENV VERSION=<version>
