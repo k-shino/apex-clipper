@@ -14,7 +14,7 @@ export csv_file=${csv_file:-cut_time_battle.csv}
 
 export MODE=${MODE:-all}
 export FORCE_PARAM=false
-export DEBUG_MODE=false
+export DEBUG_MODE=${DEBUG_MODE:-false}
 
 export REVERT=false
 
@@ -107,7 +107,8 @@ do
 done
 
 if "$DEBUG_MODE"; then
-    set -x
+    # set -x
+    :
 fi
 
 echo "---------------------------------------------------"
@@ -119,6 +120,7 @@ echo " "
 echo "Check files:"
 echo -n "  SRC_MOVIE:"
 ls -C "$SRC_MOVIE_PATH"
+find "$SRC_MOVIE_PATH"
 echo "  -----------"
 echo -n "  OUT_PATH:"
 echo "$OUT_PATH"
@@ -137,9 +139,7 @@ if ! "$DEBUG_MODE"; then
     echo "Sleep $sec sec..."
     sleep $sec
 else
-    sec=$((RANDOM % 10))
-    echo "Sleep $sec sec..."
-    sleep $sec
+    echo "Skip sleep[DEBUG MODE]"
 fi
 
 # OCRの実行
@@ -270,6 +270,10 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
                 EXEC_OCR="python /root/apex-create-movie.py \"$file\" --output \"$OUT_PATH\" --ocr \"$OCR_PATH\" --audio \"$AUDIO_CHANNEL\""
                 
                 unset $EXEC_ARGS
+
+                if "$DEBUG_MODE"; then
+                    EXEC_ARGS="$EXEC_ARGS --debug"
+                fi
 
                 echo "    -----------------------------------------"
                 echo "    exec: $EXEC_OCR $EXEC_ARGS"
