@@ -142,7 +142,7 @@ jobs:
     needs: build-amd64
     strategy:
       matrix:
-        filename: ['nospace.mp4','test with space.mp4']
+        filename: ['nospace.mp4','test with space.mp4','ocr_in_progress.mp4']
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -175,6 +175,14 @@ jobs:
       - name: check result files
         run: |
           find ./test/out -name '*.mp4' | grep -c mp4
+      - name: check if ocr in progress is skipped
+        continue-on-error: true
+        id: ocr-in-progress
+        run: |
+          find ./test/work/ocr_in_progress -name '*flg_extracted' | grep -c flg_extracted
+      - name: run if ocr-in-progress success
+        if: steps.ocr-in-progress.outcome != 'failure'
+        run: exit 1
       - name: save output artifact
         uses: actions/upload-artifact@v3
         with:
