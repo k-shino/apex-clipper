@@ -287,7 +287,8 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
 
                 echo "    -----------------------------------------"
                 echo "    Show movie files:"
-                find "${WORK_PATH}/${filename}" -type f -name '*.mp4'
+                find / -type f -name '*.mp4'
+                # find "${WORK_PATH}/${filename}" -type f -name '*.mp4'
                 echo "    -----------------------------------------"
 
 
