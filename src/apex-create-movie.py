@@ -202,7 +202,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                 log = "  [DEBUG] ffmpeg command: %s" % (command)
                 print(log)
                 logfile.write(log+'\n')
-                subprocess.run(command, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
+                subprocess.run(command, shell=True)
                 subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
 
             subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
