@@ -14,7 +14,7 @@ services:
       - DEBUG_MODE=<debug>
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 2
   # apex_tracker_mount:
   #   volumes:
   #     - ./orig:/root/src_movie/dir02
