@@ -147,6 +147,12 @@ with open(battle_write_log_path, mode='w') as logfile:
                             match_dir = battle_work_dir + '/match' + match[i] + '/rec'
                             # os.makedirs(match_dir, exist_ok=True)
                             os.makedirs(match_dir, exist_ok=True)
+                            
+                            if args.debug:
+                                duration=5
+                                log = "    [DEBUG] rec duration: %f " % (duration)
+                                print(log)
+                                logfile.write(log+'\n')
 
                             if args.audio:
                                 command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:%s -acodec copy -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\"" % (start, src_movie, duration, args.audio , match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
@@ -182,6 +188,13 @@ with open(battle_write_log_path, mode='w') as logfile:
                 os.makedirs(match_dir, exist_ok=True)
                 # os.makedirs('/rec', exist_ok=True)
                 logfile.write(log+'\n')
+
+                if args.debug:
+                    duration=5
+                    log = "  [DEBUG] rec duration: %f " % (duration)
+                    print(log)
+                    logfile.write(log+'\n')
+
                 if args.audio:
                     command = "ffmpeg -y -ss %s -i %s -t %d -map 0:v:0 -vcodec libx264 -map 0:a:%s -acodec copy -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\"" % (start, src_movie, duration, args.audio ,match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
                 else:
