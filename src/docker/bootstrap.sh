@@ -285,6 +285,12 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
                 echo "    finished exec: $EXEC_OCR $EXEC_ARGS"
                 echo "    -----------------------------------------"
 
+                echo "    -----------------------------------------"
+                echo "    Show movie files:"
+                find "${WORK_PATH}/${filename}" -type f -name '*.mp4'
+                echo "    -----------------------------------------"
+
+
                 while read -r match
                 do
                 # for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
@@ -319,7 +325,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
                     echo "    apex-tracker: start merge clipped files : ${merge_file}"
                     ffmpeg -y -f concat -safe 0 -i "$merge_file" -c copy "$output_file" </dev/null
                     # ffmpeg -y -f concat -safe 0 -i $merge_file -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file </dev/null > /dev/null 2>&1
-                    echo "      ffmpeg -y -f concat -safe 0 -i \"$merge_file\" -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file"
+                    echo "      ffmpeg -y -f concat -safe 0 -i \"$merge_file\" -c copy $output_file"
                     echo "      -----------------------------------------"
                     echo "      finish merge clips match $match"
                     echo "      -----------------------------------------"
