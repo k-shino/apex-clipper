@@ -20,6 +20,8 @@ export REVERT=false
 
 export MOVIE_DIR_LIST=$(ls $SRC_MOVIE_PATH | sort -R)
 
+export AUDIO_CHANNEL=${AUDIO_CHANNEL:-0}
+
 #############################
 PROGNAME=$(basename "$0")
 VERSION=${VERSION:-"3.12"}
@@ -265,12 +267,9 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
                     rm -rf "${match}"/rec
                 done
 
-                EXEC_OCR="python /root/apex-create-movie.py \"$file\" --output \"$OUT_PATH\" --ocr \"$OCR_PATH\""
+                EXEC_OCR="python /root/apex-create-movie.py \"$file\" --output \"$OUT_PATH\" --ocr \"$OCR_PATH\" --audio \"$AUDIO_CHANNEL\""
                 
                 unset $EXEC_ARGS
-                if [ -n "$AUDIO_CHANNEL" ]; then
-                     EXEC_ARGS="$EXEC_ARGS --audio $AUDIO_CHANNEL"
-                fi
 
                 echo "    -----------------------------------------"
                 echo "    exec: $EXEC_OCR $EXEC_ARGS"
@@ -314,7 +313,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
                     echo "      ----------------------------------------------"
 
                     echo "    apex-tracker: start merge clipped files : ${merge_file}"
-                    ffmpeg -y -f concat -safe 0 -i "$merge_file" -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 "$output_file" </dev/null
+                    ffmpeg -y -f concat -safe 0 -i "$merge_file" -c copy "$output_file" </dev/null
                     # ffmpeg -y -f concat -safe 0 -i $merge_file -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file </dev/null > /dev/null 2>&1
                     echo "      ffmpeg -y -f concat -safe 0 -i \"$merge_file\" -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file"
                     echo "      -----------------------------------------"
