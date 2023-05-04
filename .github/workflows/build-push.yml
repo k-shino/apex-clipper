@@ -36,7 +36,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push amd64
+      - name: Build and push amd64 in develop branch
         if: github.ref != 'refs/heads/main'
         uses: docker/build-push-action@v4
         with:
@@ -45,7 +45,7 @@ jobs:
           platforms: linux/amd64
           context: ${{env.context}}
           file: ${{env.dockerfile_amd64}}
-      - name: Build and push amd64
+      - name: Build and push amd64 in main branch
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v4
         with:
@@ -73,7 +73,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push arm64
+      - name: Build and push arm64 in develop branch
         if: github.ref != 'refs/heads/main'
         uses: docker/build-push-action@v4
         with:
@@ -82,7 +82,7 @@ jobs:
           platforms: linux/arm64
           context: ${{env.context}}
           file: ${{env.dockerfile_arm64}}
-      - name: Build and push arm64
+      - name: Build and push arm64 in main branch
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v4
         with:
