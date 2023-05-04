@@ -8,10 +8,10 @@ services:
       - ./work:/root/work
       - ./apex_kill_clip:/root/apex_kill_clip
     image: apex-clipper:local
-    entrypoint: ["/root/bootstrap.sh","-m","match_clip"]
+    entrypoint: ["/root/bootstrap.sh","-m","all"]
     environment:
       - AUDIO_CHANNEL=0
-      - DEBUG_MODE=false
+      - DEBUG_MODE=true
     deploy:
       mode: replicated
       replicas: 1
