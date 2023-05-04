@@ -88,6 +88,7 @@ jobs:
         run: |
           set -x
           sed -i -e 's#<mode>#ocr#' ./test/apex_tracker.yml
+          sed -i -e 's#<debug>#false#' ./test/apex_tracker.yml
           cat ./test/apex_tracker.yml
       - name: customize imagetag
         run: |
@@ -131,6 +132,7 @@ jobs:
         run: |
           set -x
           sed -i -e 's#<mode>#match_clip#' ./test/apex_tracker.yml
+          sed -i -e 's#<debug>#true#' ./test/apex_tracker.yml
           cat ./test/apex_tracker.yml
       - name: customize imagetag
         run: |
