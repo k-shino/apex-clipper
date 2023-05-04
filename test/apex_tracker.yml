@@ -9,6 +9,8 @@ services:
       - ./apex_kill_clip:/root/apex_kill_clip
     image: <image-tag>
     entrypoint: ["/root/bootstrap.sh","-m","<mode>"]
+    environment:
+      - AUDIO_CHANNEL=1
     deploy:
       mode: replicated
       replicas: 1
