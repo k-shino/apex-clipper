@@ -177,13 +177,13 @@ jobs:
         run: |
           find ./test/out -name '*.mp4' | grep -c mp4
       - name: check if ocr in progress is skipped
-        if: ${{ matrix.filename == "ocr_in_progress.mp4" }}
+        if: ${{ matrix.filename == 'ocr_in_progress.mp4' }}
         continue-on-error: true
         id: ocr-in-progress
         run: |
           find ./test/work/ocr_in_progress -name '*flg_extracted' | grep -c flg_extracted
       - name: run if ocr-in-progress success
-        if: steps.ocr-in-progress.outcome != 'failure' && ${{ matrix.filename == "ocr_in_progress.mp4" }}
+        if: steps.ocr-in-progress.outcome != 'failure' && ${{ matrix.filename == 'ocr_in_progress.mp4' }}
         run: exit 1
       - name: save output artifact
         uses: actions/upload-artifact@v3
