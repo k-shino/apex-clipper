@@ -238,11 +238,11 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
         flg_finish=${export_dir}/${filename}_flg_extracted
         file_locked=${export_dir}/${filename}_flg_locked
         flg_in_progress=${export_dir}/${filename}_flg_in_progress
-        flg_ocr_in_progress=${export_dir}/flg_in_progress
+        flg_ocr_finished=${export_dir}/flg_ocr_finished
         check_csv_battle=${export_dir}/${csv_file}
 
 
-        if [ -f "${flg_ocr_in_progress}" ]; then
+        if [ -f "${flg_ocr_finished}" ]; then
             # if [ $FORCE_PARAM ]; then
             #     echo "apex-tracker: [FORCE] rm $check_csv_battle, $check_csv_battle"
             #     rm -f $check_csv_battle
