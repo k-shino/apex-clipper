@@ -172,6 +172,9 @@ jobs:
       #     path: |
       #       test/ocr/*/cut_time_battle.csv
       #     retention-days: 1
+      - name: check result files
+        run: |
+          find ./test/out -name '*.mp4' | grep -c mp4
       - name: save output artifact
         uses: actions/upload-artifact@v3
         with:
