@@ -238,7 +238,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
         flg_finish=${export_dir}/${filename}_flg_extracted
         file_locked=${export_dir}/${filename}_flg_locked
         flg_in_progress=${export_dir}/${filename}_flg_in_progress
-        flg_ocr_finished=${export_dir}/flg_ocr_finished
+        flg_ocr_finished=${OCR_PATH}/${filename}/flg_ocr_finished
         check_csv_battle=${export_dir}/${csv_file}
 
 
@@ -351,7 +351,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
                 echo "  apex-tracker: Skip $file [Already finished]"
             fi
         else
-            echo "    OCR process running for ${export_dir} (work_in_progress flag)"
+            echo "    OCR process still running for ${export_dir} (work_in_progress flag)"
         fi
 
     done < <(echo "$list")
