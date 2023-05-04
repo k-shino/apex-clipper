@@ -11,6 +11,7 @@ services:
     entrypoint: ["/root/bootstrap.sh","-m","<mode>"]
     environment:
       - AUDIO_CHANNEL=1
+      - DEBUG_MODE=<debug>
     deploy:
       mode: replicated
       replicas: 1
