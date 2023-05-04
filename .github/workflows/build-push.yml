@@ -37,6 +37,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push amd64
+        if: ! github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}
+          platforms: linux/amd64
+          context: ${{env.context}}
+          file: ${{env.dockerfile_amd64}}
+      - name: Build and push amd64
+        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v4
         with:
           push: true
@@ -44,6 +54,7 @@ jobs:
           platforms: linux/amd64
           context: ${{env.context}}
           file: ${{env.dockerfile_amd64}}
+
   build-arm64:
     runs-on: ubuntu-latest
     steps:
@@ -63,6 +74,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push arm64
+        if: ! github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}
+          platforms: linux/arm64
+          context: ${{env.context}}
+          file: ${{env.dockerfile_arm64}}
+      - name: Build and push arm64
+        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v4
         with:
           push: true
@@ -72,6 +93,7 @@ jobs:
           file: ${{env.dockerfile_arm64}}
   test-amd64-ocr:
     runs-on: ubuntu-latest
+    if: ! github.ref == 'refs/heads/main'
     needs: build-amd64
     strategy:
       matrix:
@@ -116,6 +138,7 @@ jobs:
       #     retention-days: 1
   test-amd64-ffmpeg:
     runs-on: ubuntu-latest
+    if: ! github.ref == 'refs/heads/main'
     needs: build-amd64
     strategy:
       matrix:
