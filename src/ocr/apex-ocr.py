@@ -10,19 +10,21 @@ import re
 import pathlib
 from tqdm import tqdm
 import numpy as np
-from logging import StreamHandler, Formatter, INFO, getLogger
+# from logging import StreamHandler, Formatter, INFO, getLogger
+import logging
 import pandas as pd
 import pyocr
 import pyocr.builders
 import argparse
 
-def init_logger():
-    handler = StreamHandler()
-    handler.setLevel(INFO)
-    handler.setFormatter(Formatter("[%(asctime)s] [%(threadName)s] %(message)s"))
-    logger = getLogger()
-    logger.addHandler(handler)
-    logger.setLevel(INFO)
+
+# def init_logger.info():
+#     handler = StreamHandler()
+#     handler.setLevel(INFO)
+#     handler.setFormatter(Formatter("[%(asctime)s] [%(threadName)s] %(message)s"))
+#     logger = getLogger()
+#     logger.addHandler(handler)
+#     logger.setLevel(INFO)
 
 def pil2cv(imgPIL):
     imgCV_RGB = np.array(imgPIL, dtype=np.uint8)
@@ -32,7 +34,7 @@ def pil2cv(imgPIL):
 def change_flg(name,flg,change_bool,bool):
     ret_flg = change_bool
     if flg ^ bool:
-        getLogger().info("Switch flg %s from %s to %s" % (name, flg, bool))
+        logger.warning("Switch flg %s from %s to %s" % (name, flg, bool))
         ret_flg = True
     return bool, ret_flg
 
@@ -42,7 +44,7 @@ def tail_pd(fn, n):
 
 def apex_ocr(img, cnt,fps, type='debug',threshold_flg=False, threshold_val=[169,169,169], crop_flg=False ,crop_loc=(0,0,0,0), debug_dir='/result'):
     # if args.debug:
-    #     getLogger().info('apex_ocr')
+    #     logger.info('apex_ocr')
     img_org = Image.fromarray(pil2cv(img))
 
     if threshold_flg:
@@ -110,7 +112,7 @@ def apex_search(txt, type, search_text, cnt, status_dict, fps,writer,match,battl
             ret_no_start = int(fps * skip_after_scan)
             ret_result = True
             if args.debug:
-                getLogger().info("[%4.1f]  in apex search: find text %s (status: %s) [%s, match %s]" % (cnt/fps, search_text, status_dict, basename, match))
+                logger.info("[%4.1f]  in apex search: find text %s (status: %s) [%s, match %s]" % (cnt/fps, search_text, status_dict, basename, match))
     return ret_result, ret_no_start
 
 def main():
@@ -119,12 +121,17 @@ def main():
 
     # 動画を読み込む
     cap = cv2.VideoCapture(src_movie)
+    if not cap.isOpened():
+        logger.warning('cv2 exception error')
+        sys.exit(1)
     # フレーム数を取得
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    getLogger().info("frame count: %s" % frame_count)
+
+    logger.warning("frame count: %s" % frame_count)
     # 1秒あたりフレーム数を取得
     fps = cap.get(cv2.CAP_PROP_FPS)
-    getLogger().debug("fps: %s" % fps)
+    # logger.info("fps: %s" % fps)
+    logger.warning("fps: %s" % fps)
     # 1秒に1回予測する
     skip = int(fps/4)
     # フレーム
@@ -146,7 +153,7 @@ def main():
     else:
         no_start=args.skip
 
-    getLogger().info("init no_start / match: %d / %d" % (no_start, match))
+    logger.warning("init no_start / match: %d / %d" % (no_start, match))
 
     last_time_battle = 0
 
@@ -170,10 +177,10 @@ def main():
         os.makedirs(battle_dir, exist_ok=True)
         os.makedirs(result_dir, exist_ok=True)
         os.makedirs(debug_dir, exist_ok=True)
-        getLogger().debug("before read")
+        logger.debug("before read")
 
         ret, frame = cap.read()
-        # getLogger().info("frame : %s" % frame)
+        # logger.info("frame : %s" % frame)
         if ret:
             # if ( i >= 3251*fps and i % skip == 0 and no_start == 0 ) or not flg_smooth:
             if i % skip == 0 and ( int(no_start) == 0 or not flg_smooth):
@@ -217,13 +224,13 @@ def main():
                         out_path_image = os.path.join(
                             result_dir, "memberlist_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Switch mode from lobby to in-game [%s, match %s]" % (i/fps, basename, match))
+                        logger.info("[%4.1f]Switch mode from lobby to in-game [%s, match %s]" % (i/fps, basename, match))
                     # マップ画面
                     if result_b or result_c or result_d:
                         out_path_image = os.path.join(
                             result_dir, "map_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Open map [%s, match %s]" % (i/fps, basename, match))
+                        logger.info("[%4.1f]Open map [%s, match %s]" % (i/fps, basename, match))
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
@@ -236,21 +243,21 @@ def main():
                         out_path_image = os.path.join(
                             battle_dir, "enemy_scaned_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Scanned by enemy(switch to battle mode) [%s, match %s]" % (i/fps, basename, match))
+                        logger.info("[%4.1f]Scanned by enemy(switch to battle mode) [%s, match %s]" % (i/fps, basename, match))
 
                     # Apex Champion
                     if result_g or result_j:
                         out_path_image = os.path.join(
                             battle_dir, "champion_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("Apex Champion [%s, match %s]" % (basename, match))
+                        logger.info("Apex Champion [%s, match %s]" % (basename, match))
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
                     # ロビー画面に戻る
                     if result_h or result_i:
-                        getLogger().info("Go to lobby [%s, match %s]" % (basename, match))
+                        logger.info("Go to lobby [%s, match %s]" % (basename, match))
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,True)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
@@ -263,7 +270,7 @@ def main():
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-                        getLogger().info("[%4.1f]Use Blackhole [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Use Blackhole [%s, match %s]" % (i/fps,basename, match))
 
                     # ヴァルキリーULT
                     if result_skydive:
@@ -272,7 +279,7 @@ def main():
                         out_path_image = os.path.join(
                             result_dir, "skydive_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Skydive(valkyrie ult) [%s, match %s]" % (i/fps, basename, match))
+                        logger.info("[%4.1f]Skydive(valkyrie ult) [%s, match %s]" % (i/fps, basename, match))
 
                     ####################################                    
                     # 画面右上通知領域のOCR
@@ -298,14 +305,14 @@ def main():
                         out_path_image = os.path.join(
                             battle_dir, "enemy_found_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Found enemy [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Found enemy [%s, match %s]" % (i/fps,basename, match))
                     # 敵のシールドが割れた
                     if result_d or result_e or result_f:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
                             battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Break enemy shield [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Break enemy shield [%s, match %s]" % (i/fps,basename, match))
                     # 敵が近くに着地
                     if result_g or result_h or result_i:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -313,10 +320,10 @@ def main():
                         out_path_image = os.path.join(
                             battle_dir, "enemy_landing_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Enemy landed at near spot [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Enemy landed at near spot [%s, match %s]" % (i/fps,basename, match))
                     # マップ画面
                     if result_b:
-                        getLogger().info("[%4.1f]Open map [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Open map [%s, match %s]" % (i/fps,basename, match))
                         out_path_image = os.path.join(
                             result_dir, "map_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
@@ -327,7 +334,7 @@ def main():
                             result_dir, "result_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
                         # flg_in_lobbyがFalse -> True遷移する際にmatchをインクリメント
-                        getLogger().info("[%4.1f]Show result [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Show result [%s, match %s]" % (i/fps,basename, match))
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,True)
@@ -340,7 +347,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "kd_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                                getLogger().info("[%4.1f]Knock down [%s, match %s]" % (i/fps,basename, match))
+                                logger.info("[%4.1f]Knock down [%s, match %s]" % (i/fps,basename, match))
                                 flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                                 flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                                 flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
@@ -359,7 +366,7 @@ def main():
                             battle_dir, "death_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
-                        getLogger().info("[%4.1f]Eliminated squad [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Eliminated squad [%s, match %s]" % (i/fps,basename, match))
                     if result_b or result_c:
                         out_path_image = os.path.join(
                             battle_dir, "champion_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -367,10 +374,10 @@ def main():
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,True)
-                        getLogger().info("Arena Champion result [%s, match %s]" % (basename, match))
+                        logger.info("Arena Champion result [%s, match %s]" % (basename, match))
                     # ロビー画面に戻る
                     if result_d:
-                        getLogger().info("In lobby [%s, match %s]" % (basename, match))
+                        logger.info("In lobby [%s, match %s]" % (basename, match))
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,True)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
@@ -442,31 +449,31 @@ def main():
                         out_path_image = os.path.join(
                             battle_dir, "kd_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Knock down [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Knock down [%s, match %s]" % (i/fps,basename, match))
                     # 敵を撃破
                     if result_b:
                         out_path_image = os.path.join(
                             battle_dir, "kill_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Kill enemy [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Kill enemy [%s, match %s]" % (i/fps,basename, match))
                     # 敵をノックダウン
                     if result_h or result_i:
                         out_path_image = os.path.join(
                             battle_dir, "knock_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("Knock down enemy [%s, match %s]" % (basename, match))
+                        logger.info("[%4.1f]Knock down enemy [%s, match %s]" % (i/fps,basename, match))
                     # ダウン状態（金ノックダウンシールド有）
                     if result_c:
                         out_path_image = os.path.join(
                             battle_dir, "down_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Down player [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Down player [%s, match %s]" % (i/fps,basename, match))
                     # 降下中
                     if result_d or result_e or result_f:
                         out_path_image = os.path.join(
                             battle_dir, "landing_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Landing [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Landing [%s, match %s]" % (i/fps,basename, match))
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                     # Apex Champion
@@ -474,7 +481,7 @@ def main():
                         out_path_image = os.path.join(
                             battle_dir, "champion_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("Apex Champion [%s, match %s]" % (basename, match))
+                        logger.info("Apex Champion [%s, match %s]" % (basename, match))
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,True)
@@ -483,28 +490,28 @@ def main():
                         out_path_image = os.path.join(
                             battle_dir, "blackhole_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Use Blackhole [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Use Blackhole [%s, match %s]" % (i/fps,basename, match))
                     # 味方被弾
                     if result_l or result_m or result_w:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
                             battle_dir, "enemy_member_damaged_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Attacked by enemy [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Attacked by enemy [%s, match %s]" % (i/fps,basename, match))
                     # 味方がダウン
                     if result_n or result_s or result_t:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
                             battle_dir, "enemy_member_down_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Member down [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Member down [%s, match %s]" % (i/fps,basename, match))
                     # 敵がダメージ
                     if result_o or result_p or result_q or result_r or result_u or result_v:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
                             battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
-                        getLogger().info("[%4.1f]Attacking enemy [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Attacking enemy [%s, match %s]" % (i/fps,basename, match))
 
 
                     ####################################                    
@@ -526,7 +533,7 @@ def main():
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,True)
                         last_time_battle = 0
-                        getLogger().info("[%4.1f]Show result [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Show result [%s, match %s]" % (i/fps,basename, match))
 
                     #################################
                     # 一通りのOCR終了後の処理
@@ -542,13 +549,13 @@ def main():
                     if flg_in_battle and ( i - last_time_battle ) >= battle_duration * fps:
                         flg_in_battle = False
                         last_time_battle = 0
-                        getLogger().info("[%4.1f]Finish battle [%s, match %s]" % (i/fps,basename, match))
+                        logger.info("[%4.1f]Finish battle [%s, match %s]" % (i/fps,basename, match))
                     if args.debug:
                         no_start = 0
 
                     # ロビー　→　マッチ開始の処理
                     if not flg_in_lobby and flg_change_lobby:
-                        getLogger().info("[%4.1f][EndLoop]Start new match [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                        logger.info("[%4.1f][EndLoop]Start new match [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
                         match += 1
                         # matchディレクトリ
                         match_dir = base_dir + '/match' + str(match)
@@ -565,26 +572,26 @@ def main():
                             f.write(str(i))
                     # 戦闘終了
                     if not flg_in_battle and flg_change_battle:
-                        getLogger().info("[%4.1f][EndLoop]Finish battle [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                        logger.info("[%4.1f][EndLoop]Finish battle [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
                     # リザルト
                     if flg_in_result:
-                        getLogger().info("[%4.1f][EndLoop]Result window [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                        logger.info("[%4.1f][EndLoop]Result window [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
                         out_path_image = os.path.join(
                             result_dir, "result_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
 
                     # リザルト→ロビー
                     if not flg_in_result and flg_change_result:
-                        getLogger().info("[%4.1f][EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                        logger.info("[%4.1f][EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
                     save_index += 1
             if no_start >= 1:
                 no_start -= 1
             if args.debug:
-                getLogger().info('time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
+                logger.info('time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
         else:
-            getLogger().info("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
+            logger.warning("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
             # break
 
 if __name__ == "__main__":
@@ -635,8 +642,27 @@ if __name__ == "__main__":
     # csvファイルの定義
     cut_time_battle_csv = base_dir + '/cut_time_battle.csv'
     flg_in_progress = base_dir + '/flg_in_progress'
-    init_logger()
-    getLogger().info("main start [%s]",(basename))
+
+    logger = logging.getLogger("logger")    #logger名loggerを取得
+    logger.setLevel(logging.INFO)  #標準出力のloggerとしてはINFOで
+
+    #handler1を作成
+    handler1 = logging.StreamHandler()
+    handler1.setLevel(logging.WARN)     #handler2はLevel.WARN以上
+    handler1.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+
+    #handler2を作成
+    handler2 = logging.FileHandler(filename=base_dir+"/ocr.log")  #handler2はファイル出力
+    handler2.setLevel(logging.DEBUG)     #handler2はLevel.WARN以上
+    handler2.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+
+    #loggerに2つのハンドラを設定
+    logger.addHandler(handler1)
+    logger.addHandler(handler2)
+
+    # init_logger.info()
+    logger.warning("main start [%s]",(basename))
+
 
     ####################################
     # 捜査頻度設定
