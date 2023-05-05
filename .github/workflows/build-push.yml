@@ -120,6 +120,9 @@ jobs:
       - name: test
         run: |
           docker-compose -f ./test/apex_tracker.yml up
+      - name: check if file_error detected
+        run: |
+          find ./test/ocr/corruptmovie -name 'file_error' | grep -c 'file_error'
       - name: save ocr artifact
         uses: actions/upload-artifact@v3
         with:
