@@ -188,12 +188,16 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
                         EXEC_ARGS="$EXEC_ARGS --skip $SKIP"
                     fi
 
-                    if "$DEBUG_MODE"; then
-                        EXEC_ARGS="$EXEC_ARGS --debug"
-                    fi
+                    # if "$DEBUG_MODE"; then
+                    #     EXEC_ARGS="$EXEC_ARGS --debug"
+                    # fi
 
                     echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
                     eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\""
+                    if [ $? -ne 0 ]; then
+                        touch "${OCR_PATH}/${dir}"/file_error
+                        # exit 1
+                    fi
 
                     if [ -s "${OCR_PATH}/${dir}/${csv_file}" ]; then
                         echo $VERSION > "${OCR_PATH}/${dir}/${FINISH_FLG}"
