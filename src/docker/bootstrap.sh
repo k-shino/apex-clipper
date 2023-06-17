@@ -192,7 +192,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
                     # rm -rf ${OCR_PATH}/${dir}/match*/
                     rm -f "${OCR_PATH}/${dir}"/flg_*
                     rm -f "${OCR_PATH}/${dir}"/*flg*
-                    touch "$flg_ocr_in_progress"
+                    ls -al ${movie_file} | awk '{print $5}' > "$flg_ocr_in_progress"
 
                     EXEC_OCR="python3 /root/apex-ocr.py -o \"${OCR_PATH}\""
                     unset $EXEC_ARGS
