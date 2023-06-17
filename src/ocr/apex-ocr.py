@@ -179,6 +179,10 @@ def main():
         os.makedirs(debug_dir, exist_ok=True)
         logger.debug("before read")
 
+        # match_dir に、flg_in_progress_matchファイルを作成する
+        flg_in_progress_match = os.path.join(match_dir, 'flg_in_progress_match')
+        pathlib.Path(flg_in_progress_match).touch()
+
         ret, frame = cap.read()
         # logger.info("frame : %s" % frame)
         if ret:
@@ -556,6 +560,14 @@ def main():
                     # ロビー　→　マッチ開始の処理
                     if not flg_in_lobby and flg_change_lobby:
                         logger.info("[%4.1f][EndLoop]Start new match [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+
+                        # flg_in_progress_matchファイルを削除
+                        if os.path.exists(flg_in_progress_match):
+                            os.remove(flg_in_progress_match)
+                        # match_dir に、ocr_finishedファイルを作成する
+                        ocr_finished = os.path.join(match_dir, 'ocr_finished')
+                        pathlib.Path(ocr_finished).touch()
+                        
                         match += 1
                         # matchディレクトリ
                         match_dir = base_dir + '/match' + str(match)
@@ -568,8 +580,8 @@ def main():
                         os.makedirs(battle_dir, exist_ok=True)
                         os.makedirs(result_dir, exist_ok=True)
                         os.makedirs(debug_dir, exist_ok=True)
-                        with open(flg_in_progress, mode='w') as f:
-                            f.write(str(i))
+                        # with open(flg_in_progress, mode='w') as f:
+                        #     f.write(str(i))
                     # 戦闘終了
                     if not flg_in_battle and flg_change_battle:
                         logger.info("[%4.1f][EndLoop]Finish battle [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
