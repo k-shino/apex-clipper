@@ -438,85 +438,92 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip_foreach' ]; then
 
         for match in $(find "${OCR_PATH}/${filename}" -maxdepth 1 -type d | grep match)
         do
+            match_in_progress=${match}/flg_create_clip_in_progress
+            match_finished=${match}/flg_create_clip_finished
+            
 
             MATCH_NUM=$(echo ${match} | sed -e 's/.*match//')
             # ${OCR_PATH}/${filename}/$MATCH_NUMの中に、ocr_finishedがある場合、以下を実行する
             if [ -f "${match}"/ocr_finished ]; then
+                # match_in_progressまたはmatch_finishedがある場合はskipする
+                if [ ! -f "${match_in_progress}" ] && [ ! -f "${match_finished}" ]; then
+                    echo "  apex-tracker: Start normal extract process : $file is flagged as WIP."
+                    touch "$match_in_progress"
 
+                    EXEC_OCR="python /root/apex-create-movie-each.py \"$file\" --output \"$OUT_PATH\" --ocr \"$OCR_PATH\" --audio \"$AUDIO_CHANNEL\" --match ${MATCH_NUM}"
+                    
+                    unset $EXEC_ARGS
 
-                EXEC_OCR="python /root/apex-create-movie-each.py \"$file\" --output \"$OUT_PATH\" --ocr \"$OCR_PATH\" --audio \"$AUDIO_CHANNEL\" --match ${MATCH_NUM}"
-                
-                unset $EXEC_ARGS
-
-                if "$DEBUG_MODE"; then
-                    EXEC_ARGS="$EXEC_ARGS --debug"
-                fi
-
-                echo "    -----------------------------------------"
-                echo "    exec: $EXEC_OCR $EXEC_ARGS"
-                echo "    -----------------------------------------"
-
-                eval $EXEC_OCR $EXEC_ARGS
-
-                echo "    -----------------------------------------"
-                echo "    finished exec: $EXEC_OCR $EXEC_ARGS"
-                echo "    -----------------------------------------"
-
-                echo "    -----------------------------------------"
-                echo "    Show movie files:"
-                find / -type f -name '*.mp4'
-                # find "${WORK_PATH}/${filename}" -type f -name '*.mp4'
-                echo "    -----------------------------------------"
-
-
-                while read -r match
-                do
-                # for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
-                # do
-                    echo "      -----------------------------------------"
-                    echo "      start merge clips match $match"
-                    echo "      -----------------------------------------"
-                    merge_file="${match}"/merge.txt
-                    output_file="${OUT_PATH}/${filename}"_$(basename "$match")_merge.mp4
-
-                    if "$FORCE_PARAM" ; then
-                        echo "    apex-tracker: [FORCE] rm $merge_file, $output_file"
-                        rm -f "$merge_file"
-                        rm -f "$output_file"
+                    if "$DEBUG_MODE"; then
+                        EXEC_ARGS="$EXEC_ARGS --debug"
                     fi
 
-                    : > "$merge_file"
+                    echo "    -----------------------------------------"
+                    echo "    exec: $EXEC_OCR $EXEC_ARGS"
+                    echo "    -----------------------------------------"
 
-                    echo "    apex-tracker: create merge_file: ${merge_file}"
-                    for in_file_number in $(find "${match}"/rec -type f -name '*battle*.mp4' | sed -e 's/.*battle//g' | sed -e 's/_.*//g' | sort -n)
+                    eval $EXEC_OCR $EXEC_ARGS
+
+                    echo "    -----------------------------------------"
+                    echo "    finished exec: $EXEC_OCR $EXEC_ARGS"
+                    echo "    -----------------------------------------"
+
+                    echo "    -----------------------------------------"
+                    echo "    Show movie files:"
+                    find / -type f -name '*.mp4'
+                    # find "${WORK_PATH}/${filename}" -type f -name '*.mp4'
+                    echo "    -----------------------------------------"
+
+
+                    while read -r match
                     do
-                        in_file=$(find "${match}"/rec -type f -name "*battle${in_file_number}*")
-                        # in_file=$(ls "${match}/rec/*battle${in_file_number}*".mp4)
-                        echo "file '$in_file'" >> "$merge_file"
-                    done
+                    # for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
+                    # do
+                        echo "      -----------------------------------------"
+                        echo "      start merge clips match $match"
+                        echo "      -----------------------------------------"
+                        merge_file="${match}"/merge.txt
+                        output_file="${OUT_PATH}/${filename}"_$(basename "$match")_merge.mp4
 
-                    echo "      Show ${merge_file} :"
-                    echo "      ----------------------------------------------"
-                    cat "$merge_file"
-                    echo "      ----------------------------------------------"
+                        if "$FORCE_PARAM" ; then
+                            echo "    apex-tracker: [FORCE] rm $merge_file, $output_file"
+                            rm -f "$merge_file"
+                            rm -f "$output_file"
+                        fi
 
-                    echo "    apex-tracker: start merge clipped files : ${merge_file}"
-                    ffmpeg -y -f concat -safe 0 -i "$merge_file" -c copy "$output_file" </dev/null
-                    # ffmpeg -y -f concat -safe 0 -i $merge_file -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file </dev/null > /dev/null 2>&1
-                    echo "      ffmpeg -y -f concat -safe 0 -i \"$merge_file\" -c copy $output_file"
-                    echo "      -----------------------------------------"
-                    echo "      finish merge clips match $match"
-                    echo "      -----------------------------------------"
-                # done
-                done < <(find "${export_dir}" -maxdepth 1 -type d | grep match)
-                # for match in `find ${export_dir} -maxdepth 1 -type d | grep match`
-                # do
-                #     rm -rf ${match}/rec
-                # done
+                        : > "$merge_file"
+
+                        echo "    apex-tracker: create merge_file: ${merge_file}"
+                        for in_file_number in $(find "${match}"/rec -type f -name '*battle*.mp4' | sed -e 's/.*battle//g' | sed -e 's/_.*//g' | sort -n)
+                        do
+                            in_file=$(find "${match}"/rec -type f -name "*battle${in_file_number}*")
+                            # in_file=$(ls "${match}/rec/*battle${in_file_number}*".mp4)
+                            echo "file '$in_file'" >> "$merge_file"
+                        done
+
+                        echo "      Show ${merge_file} :"
+                        echo "      ----------------------------------------------"
+                        cat "$merge_file"
+                        echo "      ----------------------------------------------"
+
+                        echo "    apex-tracker: start merge clipped files : ${merge_file}"
+                        ffmpeg -y -f concat -safe 0 -i "$merge_file" -c copy "$output_file" </dev/null
+                        # ffmpeg -y -f concat -safe 0 -i $merge_file -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file </dev/null > /dev/null 2>&1
+                        echo "      ffmpeg -y -f concat -safe 0 -i \"$merge_file\" -c copy $output_file"
+                        echo "      -----------------------------------------"
+                        echo "      finish merge clips match $match"
+                        echo "      -----------------------------------------"
+                    # done
+                    done < <(find "${export_dir}" -maxdepth 1 -type d | grep match)
+                    # for match in `find ${export_dir} -maxdepth 1 -type d | grep match`
+                    # do
+                    #     rm -rf ${match}/rec
+                    # done
 
 
-                echo $VERSION > "$flg_finish"
-                rm -f "$flg_in_progress"
+                    echo $VERSION > "$match_finished"
+                    rm -f "$match_in_progress"
+                fi
             else
                 echo "${match} is skipped."
             fi
