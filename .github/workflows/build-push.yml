@@ -6,7 +6,11 @@ on:
       - src/**
       - .github/workflows/build-push.yml
       - test/**
-concurrency: ci-${{ github.ref }}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   dh_user: 'kshino'
   image: 'apex-clipper'
