@@ -24,7 +24,7 @@ export AUDIO_CHANNEL=${AUDIO_CHANNEL:-0}
 
 #############################
 PROGNAME=$(basename "$0")
-VERSION=${VERSION:-"3.12"}
+VERSION=${VERSION:-"3.13"}
 #############################
 
 usage() {
