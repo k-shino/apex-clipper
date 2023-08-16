@@ -9,7 +9,7 @@ docker build -f ./docker/Dockerfile-arm64 -t apex-clipper:local .
 cd ../test
 
 # ocr
-rm -rf ocr/2023-08-15_23-10-47 ocr/test ocr/2023-08-15_23-10-48
+rm -rf ocr/2023-08-15_23-10-47 ocr/test ocr/2023-08-15_23-10-48 ocr/2023-08-15_23-10-49 ocr/2023-08-15_23-10-50 ocr/2023-08-15_23-10-51
 # mkdir -p ocr
 
 # ffmpeg
