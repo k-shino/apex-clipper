@@ -387,8 +387,8 @@ def main():
                     ####################################
                     txt = apex_ocr(img,i,fps, 'killdown',False, [169,169,169], True, (810, 760, 1105, 960),debug_dir)
                     result_a,this_no_start = apex_search(txt, 'kdown', 'ノックダウン', i , '4',fps,writer,match,debug_dir)
-                    result_b,this_no_start = apex_search(txt, 'kill', '撃破', i , '4',fps,writer,match,debug_dir)
-                    result_c,this_no_start = apex_search(txt, 'kill', '自己復活', i , '4',fps,writer,match,debug_dir)
+                    result_b,this_no_start = apex_search(txt, 'kill', '撃破', i , '8',fps,writer,match,debug_dir)
+                    result_c,this_no_start = apex_search(txt, 'kill', '自己復活', i , '8',fps,writer,match,debug_dir)
                     result_d,this_no_start = apex_search(txt, 'other', 'ホールド', i , '3',fps,writer,match,debug_dir)
                     result_e,this_no_start = apex_search(txt, 'other', '同行', i , '3',fps,writer,match,debug_dir)
                     result_f,this_no_start = apex_search(txt, 'other', 'ジャンプ', i , '3',fps,writer,match,debug_dir)
