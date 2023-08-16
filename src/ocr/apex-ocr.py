@@ -190,101 +190,13 @@ def main():
                     flg_change_lobby = False
                     flg_change_result = False
                     flg_change_battle = False
-
-                    ####################################
-                    # クロップなし全画面
-                    ####################################
-                    txt = apex_ocr(img, i,fps, 'debug',False, [169,169,169], False, (1380, 173, 1800, 400),debug_dir)
-                    result_a,this_no_start = apex_search(txt, 'memberlist', '部隊メンバー', i , '1',fps,writer,match,debug_dir)
-                    result_b,this_no_start = apex_search(txt, 'map', 'マップ詳細', i , '6',fps,writer,match,debug_dir)
-                    result_c,this_no_start = apex_search(txt, 'map', 'デイリーチャレンジ', i , '6',fps,writer,match,debug_dir)
-                    result_d,this_no_start = apex_search(txt, 'map', '目的地を設定', i , '6',fps,writer,match,debug_dir)
-                    result_e,this_no_start = apex_search(txt, 'enemy', 'ドローンを検知', i , '4',fps,writer,match,debug_dir)
-                    result_f,this_no_start = apex_search(txt, 'memberlist', 'チャンピョン部隊', i , '1',fps,writer,match,debug_dir)
-                    result_g,this_no_start = apex_search(txt, 'champion', '勝者が決まりました', i , '5',fps,writer,match,debug_dir)
-                    result_h,this_no_start = apex_search(txt, 'lobby', 'マッチから退出', i , '7',fps,writer,match,debug_dir)
-                    result_i,this_no_start = apex_search(txt, 'lobby', 'ロビーに接続中', i , '7',fps,writer,match,debug_dir)
-                    result_j,this_no_start = apex_search(txt, 'champion', 'チャンピョンが決まりました', i , '5',fps,writer,match,debug_dir)
-                    result_k,this_no_start = apex_search(txt, 'blackhole', '重力の', i , '4',fps,writer,match,debug_dir)
-                    result_l,this_no_start = apex_search(txt, 'blackhole', '特異点', i , '4',fps,writer,match,debug_dir)
-                    result_m,this_no_start = apex_search(txt, 'skydive', 'エンジン', i , '3',fps,writer,match,debug_dir)
-                    result_n,this_no_start = apex_search(txt, 'skydive', '乗務員が', i , '3',fps,writer,match,debug_dir)
-                    result_o,this_no_start = apex_search(txt, 'skydive', 'ドリンクカート', i , '3',fps,writer,match,debug_dir)
-                    result_p,this_no_start = apex_search(txt, 'skydive', 'お飲み物', i , '3',fps,writer,match,debug_dir)
-                    result = result_a or result_b or result_c or result_d or result_e or result_f
-                    result_skydive = result_m or result_n or result_o or result_p
-                    if result:
-                        no_start = max(int(fps * skip_after_scan), no_start)
-                    # メンバーリスト(マッチ開始)
-                    if result_a or result_f:
-                        no_start = max(fps * 10, no_start)
-                        flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
-                        flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
-                        flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-                        out_path_image = os.path.join(
-                            result_dir, "memberlist_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
-                        logger.info("[%4.1f]Switch mode from lobby to in-game [%s, match %s]" % (i/fps, basename, match))
-                    # マップ画面
-                    if result_b or result_c or result_d:
-                        out_path_image = os.path.join(
-                            result_dir, "map_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
-                        logger.info("[%4.1f]Open map [%s, match %s]" % (i/fps, basename, match))
-                        flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
-                        flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-
-                    # 敵のスキャン
-                    if result_e:
-                        flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
-                        flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
-                        flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-                        last_time_battle = i
-                        out_path_image = os.path.join(
-                            battle_dir, "enemy_scaned_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
-                        logger.info("[%4.1f]Scanned by enemy(switch to battle mode) [%s, match %s]" % (i/fps, basename, match))
-
-                    # Apex Champion
-                    if result_g or result_j:
-                        out_path_image = os.path.join(
-                            battle_dir, "champion_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
-                        logger.info("Apex Champion [%s, match %s]" % (basename, match))
-                        flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
-                        flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
-                        flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-
-                    # ロビー画面に戻る
-                    if result_h or result_i:
-                        logger.info("Go to lobby [%s, match %s]" % (basename, match))
-                        flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
-                        flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,True)
-                        flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-
-                    if result_k or result_l:
-                        out_path_image = os.path.join(
-                            battle_dir, "blackhole_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
-                        last_time_battle = i
-                        flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
-                        flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
-                        flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-                        logger.info("[%4.1f]Use Blackhole [%s, match %s]" % (i/fps,basename, match))
-
-                    # ヴァルキリーULT
-                    if result_skydive:
-                        flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
-                        flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-                        out_path_image = os.path.join(
-                            result_dir, "skydive_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
-                        logger.info("[%4.1f]Skydive(valkyrie ult) [%s, match %s]" % (i/fps, basename, match))
+                    if args.debug:
+                      txt = apex_ocr(img, i,fps, 'debug',False, [169,169,169], False, (0, 0, 1920, 1080),debug_dir)  
 
                     ####################################                    
                     # 画面右上通知領域のOCR
                     ####################################
-                    txt = apex_ocr(img,i,fps, 'enemymap',False, [169,169,169], True, (1450, 135, 1913, 460),debug_dir)
+                    txt = apex_ocr(img,i,fps, 'top_right',False, [169,169,169], True, (1290, 173, 1800, 400),debug_dir)
                     result_a,this_no_start = apex_search(txt, 'enemy', '発見', i , '4',fps,writer,match,debug_dir)
                     result_b,this_no_start = apex_search(txt, 'map', 'クラフト', i , '6',fps,writer,match,debug_dir)
                     result_c,this_no_start = apex_search(txt, 'result', '部隊の合計キル', i , '0',fps,writer,match,debug_dir)
@@ -353,10 +265,10 @@ def main():
                                 flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
                     ####################################                    
-                    # 画面右上通知領域のOCR
+                    # 部隊全滅の中央領域
                     ####################################　ore
                     # 部隊全滅（in game）
-                    txt = apex_ocr(img,i,fps, 'death',False, [169,169,169], True, (842, 373, 1070, 448),debug_dir)
+                    txt = apex_ocr(img,i,fps, 'center',False, [169,169,169], True, (842, 373, 1070, 448),debug_dir)
                     result_a,this_no_start = apex_search(txt, 'death', '部隊', i , '5',fps,writer,match,debug_dir)
                     result_b,this_no_start = apex_search(txt, 'champion', 'アリーナ', i , '5',fps,writer,match,debug_dir)
                     result_c,this_no_start = apex_search(txt, 'champion', 'チャンピオン', i , '5',fps,writer,match,debug_dir)
@@ -383,11 +295,23 @@ def main():
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
                     ####################################                    
+                    # 撃破表示
+                    ####################################
+                    txt = apex_ocr(img,i,fps, 'kill_display',False, [169,169,169], True, (670, 750, 1328, 810),debug_dir)
+                    result_a,this_no_start = apex_search(txt, 'kill', '撃破', i , '8',fps,writer,match,debug_dir)
+                    result_b,this_no_start = apex_search(txt, 'kill', 'アシスト', i , '8',fps,writer,match,debug_dir)
+                    # 敵を撃破
+                    if result_a or result_b:
+                        out_path_image = os.path.join(
+                            battle_dir, "kill_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        cv2.imwrite(out_path_image,img)
+                        logger.info("[%4.1f]Kill enemy [%s, match %s]" % (i/fps,basename, match))
+
+                    ####################################                    
                     # 字幕＋画面中央
                     ####################################
-                    txt = apex_ocr(img,i,fps, 'killdown',False, [169,169,169], True, (810, 760, 1105, 960),debug_dir)
+                    txt = apex_ocr(img,i,fps, 'subtitle',False, [169,169,169], True, (500, 810, 1406, 930),debug_dir)
                     result_a,this_no_start = apex_search(txt, 'kdown', 'ノックダウン', i , '4',fps,writer,match,debug_dir)
-                    result_b,this_no_start = apex_search(txt, 'kill', '撃破', i , '8',fps,writer,match,debug_dir)
                     result_c,this_no_start = apex_search(txt, 'kill', '自己復活', i , '8',fps,writer,match,debug_dir)
                     result_d,this_no_start = apex_search(txt, 'other', 'ホールド', i , '3',fps,writer,match,debug_dir)
                     result_e,this_no_start = apex_search(txt, 'other', '同行', i , '3',fps,writer,match,debug_dir)
@@ -450,12 +374,6 @@ def main():
                             battle_dir, "kd_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
                         logger.info("[%4.1f]Knock down [%s, match %s]" % (i/fps,basename, match))
-                    # 敵を撃破
-                    if result_b:
-                        out_path_image = os.path.join(
-                            battle_dir, "kill_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
-                        logger.info("[%4.1f]Kill enemy [%s, match %s]" % (i/fps,basename, match))
                     # 敵をノックダウン
                     if result_h or result_i:
                         out_path_image = os.path.join(
