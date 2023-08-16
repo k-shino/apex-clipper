@@ -131,8 +131,13 @@ dmypy.json
 .DS_Store
 
 # test/ocr
-test/out
-test/work
-test/apex_kill_clip
-# test/ocr
+test/out/*
+test/work/*
+test/apex_kill_clip/*
+test/ocr/**/*.jpg
+test/ocr/**/flg_in_progress
+test/ocr/**/file_error
+test/ocr/**/flg_ocr_finished
+
+
 
