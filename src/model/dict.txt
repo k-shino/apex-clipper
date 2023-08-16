@@ -6,3 +6,4 @@
 5:death
 6:map
 7:lobby
+8:kill
