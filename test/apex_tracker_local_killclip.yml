@@ -1,0 +1,38 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  apex_tracker:
+    volumes:
+      - ./orig:/root/src_movie/dir02
+      - ./out:/root/out
+      - ./ocr:/root/ocr
+      - ./work:/root/work
+      - ./apex_kill_clip:/root/apex_kill_clip
+    image: apex-clipper:local
+    entrypoint: ["/root/bootstrap.sh","-m","kill_clip"]
+    environment:
+      - AUDIO_CHANNEL=0
+      - DEBUG_MODE=false
+    deploy:
+      mode: replicated
+      replicas: 1
+  # apex_tracker_mount:
+  #   volumes:
+  #     - ./orig:/root/src_movie/dir02
+  #     - ./out:/root/out
+  #     - ./ocr:/root/ocr
+  #     - ./work:/root/work
+  #     - ./apex_kill_clip:/root/apex_kill_clip
+  #   image: kshino/apex_tracker:m1
+  #   entrypoint: ["/root/bootstrap.sh","-m","kill_clip"]
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           capabilities: [gpu, utility]
+  #   logging:
+  #     driver: "fluentd"
+  #     options:
+  #       fluentd-address: "localhost:24224"

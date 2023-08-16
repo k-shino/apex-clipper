@@ -201,53 +201,106 @@ do
                 movie_export_dirname=$(basename "$movie_file" | awk -F[.] '{print $1}')
                 if [ -d "${ocr_dir}/${movie_export_dirname}" ]; then
                     echo "      directory ${ocr_dir}/${movie_export_dirname} exists:"
-                    if [ $(find "${ocr_dir}/${movie_export_dirname}" -type d -name 'debug' -prune -o -name "*.jpg" | grep -v debug | grep -c ".jpg") -ne 0 ]; then
-                        echo "      OCR picture exists in ${ocr_dir}/${movie_export_dirname}"
-                        echo "      OCR picture exists in ${ocr_dir}/${movie_export_dirname}" >> "${export_csv_dir}/${log}"
-                        # echo "debug ${ocr_dir}/$movie_export_dirname" 
-                        # find ${ocr_dir}/$movie_export_dirname -name "${type}_*.jpg" || true
-                        kill_clip_list=$(find "${ocr_dir}/$movie_export_dirname" -type d -name 'debug' -prune -o -name "${type}_*.jpg" | grep -v debug) || true
-                        if [ -n "$kill_clip_list" ]; then
-                        echo "        TYPE ${type} picture exists in ${ocr_dir}/${movie_export_dirname}"
-                        echo "        TYPE ${type} picture exists in ${ocr_dir}/${movie_export_dirname}" >> "${export_csv_dir}/${log}"
-                        fi
-                        # echo "        kill_clip_list $kill_clip_list"
-                        for kill_clip_file in $kill_clip_list
-                        do
-                            ################################
-                            # 動画ファイルのUNIX TIMEを出力
-                            ################################
-                            movie_start_time=$(basename "$movie_file" | awk -F[-_.] '{print $1$2$3$4$5$6}')
-                            #echo start time: $movie_start_time
-                            movie_start_time_unix=$(echo "$movie_start_time" |
-                            awk '{
-                            # 年月日時分秒を取得
-                            Y = substr($1, 1,4)*1;
-                            M = substr($1, 5,2)*1; 
-                            D = substr($1, 7,2)*1;
-                            h = substr($1, 9,2)*1;
-                            m = substr($1,11,2)*1;
-                            s = substr($1,13  )*1;
-                            # 計算公式に流し込む
-                            if (M<3) {M+=12; Y--;} # 公式を使うための値調整
-                            print (365*Y+int(Y/4)-int(Y/100)+int(Y/400)+int(306*(M+1)/10)-428+D-719163)*86400+(h*3600)+(m*60)+s;
-                            }')
-                            #echo $movie_start_time_unix
-                            ################################
-                            # 特徴点の動画ファイルでの秒数を算出
-                            ################################
-                            export_time_sec=$(basename "${kill_clip_file}" | sed -e 's/.jpg//g' | awk -F[_] '{print $NF}')
 
-                            this_export_time_unix=$(echo "scale=0; $movie_start_time_unix + $export_time_sec" | bc | sed -e 's/\..*//g')
-                            ################################
-                            # csvファイルを出力
-                            ################################
-                            echo "$this_export_time_unix $export_time_sec $movie_file $type ocr" >> "$export_csv_file_ocr_work"
-                            echo "          Record: $export_time_sec,$movie_file ($this_export_time_unix - $movie_start_time_unix) [$kill_clip_file]" >> "${export_csv_dir}/${log}"
-                            echo "          Record: $export_time_sec,$movie_file ($this_export_time_unix - $movie_start_time_unix) [$kill_clip_file]"
+                    if [ -f "${ocr_dir}/${movie_export_dirname}/cut_time_battle.csv" ]; then
 
-                        done
+                        while IFS=',' read -ra fields; do
+                            
+                            if [ "${fields[1]}" -eq 8 ]; then
+
+                                ################################
+                                # 動画ファイルのUNIX TIMEを出力
+                                ################################
+                                movie_start_time=$(basename "$movie_file" | awk -F[-_.] '{print $1$2$3$4$5$6}')
+                                #echo start time: $movie_start_time
+                                movie_start_time_unix=$(echo "$movie_start_time" |
+                                awk '{
+                                # 年月日時分秒を取得
+                                Y = substr($1, 1,4)*1;
+                                M = substr($1, 5,2)*1; 
+                                D = substr($1, 7,2)*1;
+                                h = substr($1, 9,2)*1;
+                                m = substr($1,11,2)*1;
+                                s = substr($1,13  )*1;
+                                # 計算公式に流し込む
+                                if (M<3) {M+=12; Y--;} # 公式を使うための値調整
+                                print (365*Y+int(Y/4)-int(Y/100)+int(Y/400)+int(306*(M+1)/10)-428+D-719163)*86400+(h*3600)+(m*60)+s;
+                                }')
+                                #echo $movie_start_time_unix
+                                ################################
+                                # 特徴点の動画ファイルでの秒数を算出
+                                ################################
+                                export_time_sec=${fields[0]}
+
+
+                                this_export_time_unix=$(echo "scale=0; $movie_start_time_unix + $export_time_sec" | bc | sed -e 's/\..*//g')
+                                ################################
+                                # csvファイルを出力
+                                ################################
+                                echo "$this_export_time_unix $export_time_sec $movie_file $type ocr" >> "$export_csv_file_ocr_work"
+                                echo "          Record: $export_time_sec,$movie_file ($this_export_time_unix - $movie_start_time_unix)" >> "${export_csv_dir}/${log}"
+                                echo "          Record: $export_time_sec,$movie_file ($this_export_time_unix - $movie_start_time_unix)"
+
+
+                            fi
+
+                            # # fields配列には、行の各フィールドが格納される
+                            # for field in "${fields[@]}"; do
+                            #     echo "$field"
+                            # done
+                        done < "${ocr_dir}/${movie_export_dirname}/cut_time_battle.csv"
+
+                    else
+                        echo "No csv file found."
                     fi
+
+                    # if [ $(find "${ocr_dir}/${movie_export_dirname}" -type d -name 'debug' -prune -o -name "*.jpg" | grep -v debug | grep -c ".jpg") -ne 0 ]; then
+                    #     echo "      OCR picture exists in ${ocr_dir}/${movie_export_dirname}"
+                    #     echo "      OCR picture exists in ${ocr_dir}/${movie_export_dirname}" >> "${export_csv_dir}/${log}"
+                    #     # echo "debug ${ocr_dir}/$movie_export_dirname" 
+                    #     # find ${ocr_dir}/$movie_export_dirname -name "${type}_*.jpg" || true
+                    #     kill_clip_list=$(find "${ocr_dir}/$movie_export_dirname" -type d -name 'debug' -prune -o -name "${type}_*.jpg" | grep -v debug) || true
+                    #     if [ -n "$kill_clip_list" ]; then
+                    #     echo "        TYPE ${type} picture exists in ${ocr_dir}/${movie_export_dirname}"
+                    #     echo "        TYPE ${type} picture exists in ${ocr_dir}/${movie_export_dirname}" >> "${export_csv_dir}/${log}"
+                    #     fi
+                    #     # echo "        kill_clip_list $kill_clip_list"
+                    #     for kill_clip_file in $kill_clip_list
+                    #     do
+                    #         ################################
+                    #         # 動画ファイルのUNIX TIMEを出力
+                    #         ################################
+                    #         movie_start_time=$(basename "$movie_file" | awk -F[-_.] '{print $1$2$3$4$5$6}')
+                    #         #echo start time: $movie_start_time
+                    #         movie_start_time_unix=$(echo "$movie_start_time" |
+                    #         awk '{
+                    #         # 年月日時分秒を取得
+                    #         Y = substr($1, 1,4)*1;
+                    #         M = substr($1, 5,2)*1; 
+                    #         D = substr($1, 7,2)*1;
+                    #         h = substr($1, 9,2)*1;
+                    #         m = substr($1,11,2)*1;
+                    #         s = substr($1,13  )*1;
+                    #         # 計算公式に流し込む
+                    #         if (M<3) {M+=12; Y--;} # 公式を使うための値調整
+                    #         print (365*Y+int(Y/4)-int(Y/100)+int(Y/400)+int(306*(M+1)/10)-428+D-719163)*86400+(h*3600)+(m*60)+s;
+                    #         }')
+                    #         #echo $movie_start_time_unix
+                    #         ################################
+                    #         # 特徴点の動画ファイルでの秒数を算出
+                    #         ################################
+                    #         export_time_sec=$(basename "${kill_clip_file}" | sed -e 's/.jpg//g' | awk -F[_] '{print $NF}')
+
+                    #         this_export_time_unix=$(echo "scale=0; $movie_start_time_unix + $export_time_sec" | bc | sed -e 's/\..*//g')
+                    #         ################################
+                    #         # csvファイルを出力
+                    #         ################################
+                    #         echo "$this_export_time_unix $export_time_sec $movie_file $type ocr" >> "$export_csv_file_ocr_work"
+                    #         echo "          Record: $export_time_sec,$movie_file ($this_export_time_unix - $movie_start_time_unix) [$kill_clip_file]" >> "${export_csv_dir}/${log}"
+                    #         echo "          Record: $export_time_sec,$movie_file ($this_export_time_unix - $movie_start_time_unix) [$kill_clip_file]"
+
+                    #     done
+                    # fi
                 else
                     echo "      directory ${ocr_dir}/${movie_export_dirname} does not exist."
                 fi
