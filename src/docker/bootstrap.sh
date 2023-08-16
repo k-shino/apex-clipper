@@ -16,6 +16,8 @@ export MODE=${MODE:-all}
 export FORCE_PARAM=false
 export DEBUG_MODE=${DEBUG_MODE:-false}
 
+export IS_START_DELAY=${IS_START_DELAY:-true}
+
 export REVERT=false
 
 export MOVIE_DIR_LIST=$(ls $SRC_MOVIE_PATH | sort -R)
@@ -134,12 +136,12 @@ echo -n "  WORK_PATH:"
 echo "$WORK_PATH"
 # ls -al "$WORK_PATH"
 echo "  -----------"
-if ! "$DEBUG_MODE"; then
+if "$IS_START_DELAY"; then
     sec=$((RANDOM % 100))
     echo "Sleep $sec sec..."
     sleep $sec
 else
-    echo "Skip sleep[DEBUG MODE]"
+    echo "Skip sleep[IS_START_DELAY = false]"
 fi
 
 # OCRの実行
@@ -195,15 +197,15 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
                     ls -al ${movie_file} | awk '{print $5}' > "$flg_ocr_in_progress"
 
                     EXEC_OCR="python3 /root/apex-ocr.py -o \"${OCR_PATH}\""
-                    unset $EXEC_ARGS
+                    EXEC_ARGS=""
 
                     if [ -n "$SKIP" ]; then
                         EXEC_ARGS="$EXEC_ARGS --skip $SKIP"
                     fi
 
-                    # if "$DEBUG_MODE"; then
-                    #     EXEC_ARGS="$EXEC_ARGS --debug"
-                    # fi
+                    if "$DEBUG_MODE"; then
+                        EXEC_ARGS="$EXEC_ARGS --debug"
+                    fi
 
                     echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
                     eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\""
