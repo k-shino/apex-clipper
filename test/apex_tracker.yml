@@ -10,7 +10,7 @@ services:
     image: <image-tag>
     entrypoint: ["/root/bootstrap.sh","-m","<mode>"]
     environment:
-      - AUDIO_CHANNEL=0
+      - AUDIO_CHANNEL=<audio>
       - DEBUG_MODE=<debug>
     deploy:
       mode: replicated
