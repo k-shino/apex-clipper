@@ -555,14 +555,13 @@ if [ $MODE == 'all' -o $MODE == 'kill_clip' ]; then
 
     type_list=${type_list:-"default"}
 
+    EXEC_KILL_CLIP="/root/apex-kill-clip.sh --out ${KILL_CLIP_PATH} --movie ${SRC_MOVIE_PATH} --ocr ${OCR_PATH} --type ${type_list} -a ${AUDIO_CHANNEL}"
+
     if "$REVERT"; then
-        echo "/root/apex-kill-clip.sh --out ${KILL_CLIP_PATH} --movie ${SRC_MOVIE_PATH} --ocr ${OCR_PATH} --revert --type ${type_list}"
-        /root/apex-kill-clip.sh --out ${KILL_CLIP_PATH} --movie ${SRC_MOVIE_PATH} --ocr ${OCR_PATH} --revert --type ${type_list}
-    else
-        echo "/root/apex-kill-clip.sh --out ${KILL_CLIP_PATH} --movie ${SRC_MOVIE_PATH} --ocr ${OCR_PATH} --type ${type_list}"
-        /root/apex-kill-clip.sh --out ${KILL_CLIP_PATH} --movie ${SRC_MOVIE_PATH} --ocr ${OCR_PATH} --type ${type_list}
+        EXEC_KILL_CLIP_ARGS=" --revert"
     fi
 
-    # echo "/root/apex-ocr-exporter.sh -b ${OUT_PATH} -o ${OCR_PATH} -d ${OUT_PATH} --mode result"
-    # /root/apex-ocr-exporter.sh -b ${OUT_PATH} -o ${OCR_PATH} -d ${OUT_PATH} -w ${WORK_PATH} --mode result
+    echo "$EXEC_KILL_CLIP $EXEC_KILL_CLIP_ARGS"
+    eval "$EXEC_KILL_CLIP $EXEC_KILL_CLIP_ARGS"
+
 fi

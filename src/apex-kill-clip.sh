@@ -343,7 +343,6 @@ while read row; do
             this_save_file=${export_csv_local_dir}/${this_unix_time}_${last_type}_killfinish_${this_basefilename}.mp4
         fi
 
-        this_audio=$audio
 
         if [ $(find "${export_csv_local_dir}" -name "${this_unix_time}_*" | wc -l) -eq 0 ] && [ $(find "${export_csv_local_dir}" -name "*_${this_basefilename}.mp4" | wc -l) -eq 0 ] && [ ! -f "${this_save_file}" ]; then
             echo "      Exec: kill_clip $last_src_file $this_start_time $this_duration $this_save_file"
@@ -426,7 +425,6 @@ else
     this_save_file=${export_csv_local_dir}/${this_filename}
 fi
 
-this_audio=$audio
 
 sort_fname=$(basename "${this_filename}" .mp4)
 
@@ -453,6 +451,23 @@ fi
 cat "${ffmpeg_command}"
 cmd_file='./command.sh'
 
+
+# audioの処理
+
+OLDIFS=$IFS
+# IFSをカンマに設定して文字列を分割
+IFS=',' read -ra elements <<< "$audio"
+
+AUDIO_ARGS=""
+
+# 配列の要素を表示
+for element in "${elements[@]}"; do
+    echo "$element"
+    echo " -map 0:a:${element}"
+    AUDIO_ARGS=" -map 0:a:${element} ${AUDIO_ARGS}"
+done
+IFS=$OLDIFS
+
 cat <<EOF > $cmd_file
 #!/bin/bash
 
@@ -474,7 +489,7 @@ kill_clip () {
     i=0
     while :; do
         echo "      ffmpeg trial in kill_clip: \$i"
-        ffmpeg -y -ss \$2 -i \$1 -t \$3 -vcodec libx264 -acodec libmp3lame -vsync 1 -async 1000 -map 0:v:0 -map 0:a:1 -map 0:a:2 -map 0:a:3 \${file_kill_clip} </dev/null 2>&1
+        ffmpeg -y -ss \$2 -i \$1 -t \$3 -vcodec libx264 -acodec libmp3lame -vsync 1 -async 1000 -map 0:v:0 ${AUDIO_ARGS} \${file_kill_clip} </dev/null 2>&1
         [[ \`ls -l \${file_kill_clip} | awk '{print \$5}'\` -gt 262 ]] && break
         i=\$(expr \$i + 1)
         [[ i -eq 5 ]] && break
