@@ -198,6 +198,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
                     eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\""
                     if [ $? -ne 0 ]; then
                         touch "${OCR_PATH}/${dir}"/file_error
+                        rm -f "$flg_ocr_in_progress"
                         # exit 1
                     fi
 
