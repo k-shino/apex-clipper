@@ -208,8 +208,8 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
                     fi
 
                     echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
-                    eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\""
-                    if [ $? -ne 0 ]; then
+                    if ! eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\"";
+                    then
                         touch "${OCR_PATH}/${dir}"/file_error
                         rm -f "$flg_ocr_in_progress"
                         # exit 1
