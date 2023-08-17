@@ -233,7 +233,7 @@ do
                                 export_time_sec=${fields[0]}
 
 
-                                this_export_time_unix=$(echo "scale=0; $movie_start_time_unix + $export_time_sec" | bc | sed -e 's/\..*//g')
+                                this_export_time_unix=$(echo "scale=0; $movie_start_time_unix + $export_time_sec" | bc | sed 's/^\./0./' | sed -e 's/\..*//g')
                                 ################################
                                 # csvファイルを出力
                                 ################################
@@ -291,7 +291,7 @@ do
                     #         ################################
                     #         export_time_sec=$(basename "${kill_clip_file}" | sed -e 's/.jpg//g' | awk -F[_] '{print $NF}')
 
-                    #         this_export_time_unix=$(echo "scale=0; $movie_start_time_unix + $export_time_sec" | bc | sed -e 's/\..*//g')
+                    #         this_export_time_unix=$(echo "scale=0; $movie_start_time_unix + $export_time_sec" | bc | sed 's/^\./0./' | sed -e 's/\..*//g')
                     #         ################################
                     #         # csvファイルを出力
                     #         ################################
@@ -344,19 +344,19 @@ while read row; do
         if [ -n "$start_time" ]; then
             echo "      param start_time exists: ($start_time)" >> "${export_csv_dir}/${log}"
             if [ "$last_type" = "champion" ]; then
-                this_start_time=$(echo "scale=1; $start_time - $champion_duration + 4" | bc )
+                this_start_time=$(echo "scale=1; $start_time - $champion_duration + 4" | bc | sed 's/^\./0./' )
             elif [ "$last_type" = "death" ]; then
-                this_start_time=$(echo "scale=1; $start_time - $death_duration + 4" | bc )
+                this_start_time=$(echo "scale=1; $start_time - $death_duration + 4" | bc | sed 's/^\./0./' )
             else
-                this_start_time=$(echo "scale=1; $start_time - $movie_duration + 4" | bc )
+                this_start_time=$(echo "scale=1; $start_time - $movie_duration + 4" | bc | sed 's/^\./0./' )
             fi
             if [ "$this_type" == "blackhole" ]; then
                 this_duration=$blackhole_duration
             elif [ "$this_type" == "death" ]; then
                 # this_duration=$death_duration
-                this_duration=$(echo "scale=1; $last_export_point - $this_start_time + 4" | bc )
+                this_duration=$(echo "scale=1; $last_export_point - $this_start_time + 4" | bc | sed 's/^\./0./' )
             else
-                this_duration=$(echo "scale=1; $last_export_point - $this_start_time + 4" | bc)
+                this_duration=$(echo "scale=1; $last_export_point - $this_start_time + 4" | bc | sed 's/^\./0./')
             fi
             echo "      show variables: start_time: $start_time | this_duration: $this_duration | this_start_time: $this_start_time | last_export_point: $last_export_point" >> "${export_csv_dir}/${log}"
             echo "      show variables: start_time: $start_time | this_duration: $this_duration | this_start_time: $this_start_time | last_export_point: $last_export_point"
@@ -364,19 +364,19 @@ while read row; do
             echo "      param start_time does not exist:"
             echo "      param start_time does not exist:" >> "${export_csv_dir}/${log}"
             if [ "$last_type" = "champion" ]; then
-                this_start_time=$(echo "scale=1; $last_export_point - $champion_duration + 4" | bc )
+                this_start_time=$(echo "scale=1; $last_export_point - $champion_duration + 4" | bc | sed 's/^\./0./' )
                 this_duration=$champion_duration
             elif [ "$last_type" = "death" ]; then
-                this_start_time=$(echo "scale=1; $last_export_point - $death_duration + 4" | bc )
+                this_start_time=$(echo "scale=1; $last_export_point - $death_duration + 4" | bc | sed 's/^\./0./' )
                 this_duration=$death_duration
-                # this_duration=`echo "scale=1; $last_export_point - $this_start_time + 4" | bc`
+                # this_duration=`echo "scale=1; $last_export_point - $this_start_time + 4" | bc | sed 's/^\./0./'`
             else
-                this_start_time=$(echo "scale=1; $last_export_point - $movie_duration + 4" | bc )
+                this_start_time=$(echo "scale=1; $last_export_point - $movie_duration + 4" | bc | sed 's/^\./0./' )
                 if [ "$this_type" == "blackhole" ]; then
                     this_duration=$blackhole_duration
                 elif [ "$this_type" == "death" ]; then
                     this_duration=$death_duration
-                    # this_duration=`echo "scale=1; $last_export_point - $this_start_time + 4" | bc`
+                    # this_duration=`echo "scale=1; $last_export_point - $this_start_time + 4" | bc | sed 's/^\./0./'`
                 else
                     this_duration=$movie_duration
                 fi
@@ -390,7 +390,7 @@ while read row; do
         # type=knockが最終抽出点の場合，録画時間を10秒延長する
         if [ "$last_type" = "knock" ]; then
             # this_duration=$((this_duration+10))
-            this_duration=$(echo "scale=1; $this_duration + 10" | bc)
+            this_duration=$(echo "scale=1; $this_duration + 10" | bc | sed 's/^\./0./')
             this_save_file=${export_csv_local_dir}/${this_unix_time}_${last_type}_${this_basefilename}.mp4
         else
             this_save_file=${export_csv_local_dir}/${this_unix_time}_${last_type}_killfinish_${this_basefilename}.mp4
@@ -428,18 +428,18 @@ if [ -n "$start_time" ]; then
     echo "      param start_time exists: ($start_time)"
     echo "      param start_time exists: ($start_time)" >> "${export_csv_dir}/${log}"
     if [ "$this_type" = "champion" ]; then
-        this_start_time=$(echo "scale=1; $start_time - $champion_duration + 4" | bc )
+        this_start_time=$(echo "scale=1; $start_time - $champion_duration + 4" | bc | sed 's/^\./0./' )
     elif [ "$last_type" = "death" ]; then
-        this_start_time=$(echo "scale=1; $start_time - $death_duration + 4" | bc )
+        this_start_time=$(echo "scale=1; $start_time - $death_duration + 4" | bc | sed 's/^\./0./' )
     else
-        this_start_time=$(echo "scale=1; $start_time - $movie_duration + 4" | bc )
+        this_start_time=$(echo "scale=1; $start_time - $movie_duration + 4" | bc | sed 's/^\./0./' )
     fi
     if [ $this_type == "blackhole" ]; then
         this_duration=$blackhole_duration
     # elif [ $this_type == "death" ]; then
     #     this_duration=$death_duration
     else
-        this_duration=$(echo "scale=1; $last_export_point - $this_start_time + 4" | bc)
+        this_duration=$(echo "scale=1; $last_export_point - $this_start_time + 4" | bc | sed 's/^\./0./')
     fi
     echo "      show variables: start_time: $start_time | this_duration: $this_duration | this_start_time: $this_start_time | last_export_point: $last_export_point" >> "${export_csv_dir}/${log}"
     echo "      show variables: start_time: $start_time | this_duration: $this_duration | this_start_time: $this_start_time | last_export_point: $last_export_point"
@@ -447,13 +447,13 @@ else
     echo "      param start_time does not exist:"
     echo "      param start_time does not exist:" >> "${export_csv_dir}/${log}"
     if [ "$this_type" = "champion" ]; then
-        this_start_time=$(echo "scale=1; $this_export_point - $champion_duration + 4" | bc )
+        this_start_time=$(echo "scale=1; $this_export_point - $champion_duration + 4" | bc | sed 's/^\./0./' )
         this_duration=$champion_duration
     elif [ "$last_type" = "death" ]; then
-        this_start_time=$(echo "scale=1; $this_export_point - $death_duration + 4" | bc )
+        this_start_time=$(echo "scale=1; $this_export_point - $death_duration + 4" | bc | sed 's/^\./0./' )
         this_duration=$death_duration
     else
-        this_start_time=$(echo "scale=1; $this_export_point - $movie_duration + 4" | bc )
+        this_start_time=$(echo "scale=1; $this_export_point - $movie_duration + 4" | bc | sed 's/^\./0./' )
 
         if [ $this_type == "blackhole" ]; then
             this_duration=$blackhole_duration
@@ -470,7 +470,7 @@ fi
 # type=knockが最終抽出点の場合，録画時間を10秒延長する
 if [ "$last_type" = "knock" ]; then
     # this_duration=$((this_duration+10))
-    this_duration=$(echo "scale=1; $this_duration + 10" | bc)
+    this_duration=$(echo "scale=1; $this_duration + 10" | bc | sed 's/^\./0./')
     this_filename=${this_unix_time}_${this_type}_$(basename "$last_src_file" | awk -F[.] '{print $1}')_${this_start_time}_${rec}.mp4
     this_save_file=${export_csv_local_dir}/${this_filename}
 else
