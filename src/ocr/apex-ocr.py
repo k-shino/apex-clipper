@@ -554,6 +554,9 @@ def main():
             else:
                 logger.warning("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
                 # break
+    else:
+        logger.warning("file error (frame_count is minus)")
+        sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
