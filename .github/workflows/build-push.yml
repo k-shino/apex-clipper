@@ -256,5 +256,5 @@ jobs:
         with:
           name: result movie
           path: |
-            test/apex_kill_clip/*.mp4
+            test/apex_kill_clip/**/*.mp4
           retention-days: 1
