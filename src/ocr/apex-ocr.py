@@ -192,7 +192,7 @@ def main():
                         flg_change_result = False
                         flg_change_battle = False
                         if args.debug:
-                        txt = apex_ocr(img, i,fps, 'debug',False, [169,169,169], False, (0, 0, 1920, 1080),debug_dir)  
+                            txt = apex_ocr(img, i,fps, 'debug',False, [169,169,169], False, (0, 0, 1920, 1080),debug_dir)  
 
                         ####################################                    
                         # 画面右上通知領域のOCR
@@ -467,7 +467,7 @@ def main():
                             cv2.imwrite(out_path_image,img)
                             logger.info("[%4.1f]Member down [%s, match %s]" % (i/fps,basename, match))
                         # 敵がダメージ
-                        if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we of result_wf  or result_wj or result_wk or result_wl or result_wp or result_wq:
+                        if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we or result_wf or result_wj or result_wk or result_wl or result_wp or result_wq:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                             out_path_image = os.path.join(
                                 battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
