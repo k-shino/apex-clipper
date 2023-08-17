@@ -546,7 +546,6 @@ def main():
                     # 戦闘終了
                     if not flg_in_battle and flg_change_battle:
                         logger.info("[%4.1f][EndLoop]Finish battle [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
-
                         # リザルト
                         if flg_in_result:
                             logger.info("[%4.1f][EndLoop]Result window [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
