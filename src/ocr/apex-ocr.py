@@ -304,12 +304,21 @@ def main():
                     txt = apex_ocr(img,i,fps, 'kill_display',False, [169,169,169], True, (670, 750, 1328, 810),debug_dir)
                     result_a,this_no_start = apex_search(txt, 'kill', '撃破', i , '8',fps,writer,match,debug_dir)
                     result_b,this_no_start = apex_search(txt, 'kill', 'アシスト', i , '8',fps,writer,match,debug_dir)
+                    result_c,this_no_start = apex_search(txt, 'kdown', 'ノックダウン', i , '4',fps,writer,match,debug_dir)
+                    result_d,this_no_start = apex_search(txt, 'kdown', '与', i , '4',fps,writer,match,debug_dir)
+                    result_e,this_no_start = apex_search(txt, 'kdown', 'ダメージ', i , '4',fps,writer,match,debug_dir)
                     # 敵を撃破
                     if result_a or result_b:
                         out_path_image = os.path.join(
                             battle_dir, "kill_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
                         logger.info("[%4.1f]Kill enemy [%s, match %s]" % (i/fps,basename, match))
+                    # ノックダウン
+                    if result_c or result_d or result_e:
+                        out_path_image = os.path.join(
+                            battle_dir, "knock_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        cv2.imwrite(out_path_image,img)
+                        logger.info("[%4.1f]Knock down enemy [%s, match %s]" % (i/fps,basename, match))
 
                     ####################################                    
                     # 字幕＋画面中央
