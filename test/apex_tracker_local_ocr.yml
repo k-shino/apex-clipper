@@ -11,7 +11,7 @@ services:
     entrypoint: ["/root/bootstrap.sh","-m","ocr"]
     environment:
       - AUDIO_CHANNEL=1
-      - DEBUG_MODE=false
+      - DEBUG_MODE=true
       - IS_START_DELAY=false
     deploy:
       mode: replicated
