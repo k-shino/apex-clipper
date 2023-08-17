@@ -272,11 +272,12 @@ def main():
                     # 部隊全滅の中央領域
                     ####################################　ore
                     # 部隊全滅（in game）
-                    txt = apex_ocr(img,i,fps, 'center',False, [169,169,169], True, (842, 373, 1070, 448),debug_dir)
+                    txt = apex_ocr(img,i,fps, 'center',False, [169,169,169], True, (770, 197, 1150, 448),debug_dir)
                     result_a,this_no_start = apex_search(txt, 'death', '部隊', i , '5',fps,writer,match,debug_dir)
                     result_b,this_no_start = apex_search(txt, 'champion', 'アリーナ', i , '5',fps,writer,match,debug_dir)
                     result_c,this_no_start = apex_search(txt, 'champion', 'チャンピオン', i , '5',fps,writer,match,debug_dir)
                     result_d,this_no_start = apex_search(txt, 'lobby', '戦績を表示', i , '7',fps,writer,match,debug_dir)
+                    result_e,this_no_start = apex_search(txt, 'forgeshadow', 'フォージシャドウ', i , '4',fps,writer,match,debug_dir)
                     if result_a:
                         out_path_image = os.path.join(
                             battle_dir, "death_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -297,6 +298,12 @@ def main():
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                         flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,True)
                         flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+                    # レヴのULT
+                    if result_e:
+                        out_path_image = os.path.join(
+                            battle_dir, "revenant_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        cv2.imwrite(out_path_image,img)
+                        logger.info("[%4.1f]Use Forge Shadow [%s, match %s]" % (i/fps,basename, match))
 
                     ####################################                    
                     # 撃破表示
@@ -335,42 +342,44 @@ def main():
                     result_j,this_no_start = apex_search(txt, 'blackhole', '重力の', i , '4',fps,writer,match,debug_dir)
                     result_k,this_no_start = apex_search(txt, 'blackhole', '特異点', i , '4',fps,writer,match,debug_dir)
                     result_l,this_no_start = apex_search(txt, 'enemy', 'フーリガンども', i , '4',fps,writer,match,debug_dir) # 味方被弾(ホライゾン)
-                    result_l,this_no_start = apex_search(txt, 'enemy', '撃たれて', i , '4',fps,writer,match,debug_dir) # 味方被弾(オクタン/ホライゾン/シア)
+                    result_la,this_no_start = apex_search(txt, 'enemy', '撃たれて', i , '4',fps,writer,match,debug_dir) # 味方被弾(オクタン/ホライゾン/シア)
                     result_m,this_no_start = apex_search(txt, 'enemy', '攻撃されている', i , '4',fps,writer,match,debug_dir) # レブナント/クリプト被弾
-                    result_m,this_no_start = apex_search(txt, 'enemy', '攻撃がきた', i , '4',fps,writer,match,debug_dir) # ミラージュ被弾
+                    result_ma,this_no_start = apex_search(txt, 'enemy', '攻撃がきた', i , '4',fps,writer,match,debug_dir) # ミラージュ被弾
                     result_n,this_no_start = apex_search(txt, 'enemy', 'ダウンした', i , '4',fps,writer,match,debug_dir) # ヒューズダウン
-                    result_n,this_no_start = apex_search(txt, 'enemy', '雑魚に', i , '4',fps,writer,match,debug_dir) # ヒューズ被弾
-                    result_n,this_no_start = apex_search(txt, 'enemy', 'ダウンさせられた', i , '4',fps,writer,match,debug_dir) # ヒューズダウン
+                    result_na,this_no_start = apex_search(txt, 'enemy', '雑魚に', i , '4',fps,writer,match,debug_dir) # ヒューズ被弾
+                    result_nb,this_no_start = apex_search(txt, 'enemy', 'ダウンさせられた', i , '4',fps,writer,match,debug_dir) # ヒューズダウン
                     result_o,this_no_start = apex_search(txt, 'enemy', 'ダメージをくれて', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
                     result_p,this_no_start = apex_search(txt, 'enemy', '命中', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(クリプト)
                     result_q,this_no_start = apex_search(txt, 'enemy', '撃ってる', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン/ヒューズ)
                     result_r,this_no_start = apex_search(txt, 'enemy', '撃っている', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
                     result_s,this_no_start = apex_search(txt, 'enemy', 'アタシとニュートがダウン', i , '4',fps,writer,match,debug_dir) # ホライゾンダウン
                     result_t,this_no_start = apex_search(txt, 'enemy', 'ダウンだ', i , '4',fps,writer,match,debug_dir) # ヒューズダウン
-                    result_t,this_no_start = apex_search(txt, 'enemy', 'ナックルクラスター', i , '4',fps,writer,match,debug_dir) # ヒューズ戦術
+                    result_ta,this_no_start = apex_search(txt, 'enemy', 'ナックルクラスター', i , '4',fps,writer,match,debug_dir) # ヒューズ戦術
                     result_u,this_no_start = apex_search(txt, 'enemy', '弾でもくらいな', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ヒューズ)
                     result_v,this_no_start = apex_search(txt, 'enemy', '引き金を引くよ', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
-                    result_v,this_no_start = apex_search(txt, 'enemy', '科学的に表現', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
-                    result_v,this_no_start = apex_search(txt, 'enemy', '敵がいる', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
-                    result_v,this_no_start = apex_search(txt, 'enemy', 'すぐ近くに', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
+                    result_va,this_no_start = apex_search(txt, 'enemy', '科学的に表現', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
+                    result_vb,this_no_start = apex_search(txt, 'enemy', '敵がいる', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
+                    result_vc,this_no_start = apex_search(txt, 'enemy', 'すぐ近くに', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
                     result_w,this_no_start = apex_search(txt, 'enemy', 'ダメージを受けている', i , '4',fps,writer,match,debug_dir) # 味方被弾(クリプト)
-                    result_w,this_no_start = apex_search(txt, 'enemy', 'ベールを', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', 'ベールの', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', '外します', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', 'お見せしま', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', '攻撃中です', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', '射撃開始', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', '別部隊から', i , '4',fps,writer,match,debug_dir) # シア被弾
-                    result_w,this_no_start = apex_search(txt, 'enemy', '攻撃を受けて', i , '4',fps,writer,match,debug_dir) # シア被弾
-                    result_w,this_no_start = apex_search(txt, 'enemy', '攻撃されて', i , '4',fps,writer,match,debug_dir) # シア被弾
-                    result_w,this_no_start = apex_search(txt, 'enemy', '敵の姿を', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', '敵をダウン', i , '4',fps,writer,match,debug_dir) # 敵ダウン(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', '確認できます', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', 'ダウンしました', i , '4',fps,writer,match,debug_dir) # シアダウン
-                    result_w,this_no_start = apex_search(txt, 'enemy', '私のハート', i , '4',fps,writer,match,debug_dir) # シアウルト
-                    result_w,this_no_start = apex_search(txt, 'enemy', 'ハートを聞き', i , '4',fps,writer,match,debug_dir) # シアウルト
-                    result_w,this_no_start = apex_search(txt, 'enemy', '美しいですね', i , '4',fps,writer,match,debug_dir) # 敵全滅(シア)
-                    result_w,this_no_start = apex_search(txt, 'enemy', '美と化し', i , '4',fps,writer,match,debug_dir) # 敵全滅(シア)
+                    result_wa,this_no_start = apex_search(txt, 'enemy', 'ベールを', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
+                    result_wb,this_no_start = apex_search(txt, 'enemy', 'ベールの', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
+                    result_wc,this_no_start = apex_search(txt, 'enemy', '外します', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
+                    result_wd,this_no_start = apex_search(txt, 'enemy', 'お見せしま', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
+                    result_we,this_no_start = apex_search(txt, 'enemy', '攻撃中です', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
+                    result_wf,this_no_start = apex_search(txt, 'enemy', '射撃開始', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
+                    result_wg,this_no_start = apex_search(txt, 'enemy', '別部隊から', i , '4',fps,writer,match,debug_dir) # シア被弾
+                    result_wh,this_no_start = apex_search(txt, 'enemy', '攻撃を受けて', i , '4',fps,writer,match,debug_dir) # シア被弾
+                    result_wi,this_no_start = apex_search(txt, 'enemy', '攻撃されて', i , '4',fps,writer,match,debug_dir) # シア被弾
+                    result_wj,this_no_start = apex_search(txt, 'enemy', '敵の姿を', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
+                    result_wk,this_no_start = apex_search(txt, 'enemy', '敵をダウン', i , '4',fps,writer,match,debug_dir) # 敵ダウン(シア)
+                    result_wl,this_no_start = apex_search(txt, 'enemy', '確認できます', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(シア)
+                    result_wm,this_no_start = apex_search(txt, 'enemy', 'ダウンしました', i , '4',fps,writer,match,debug_dir) # シアダウン
+                    result_wn,this_no_start = apex_search(txt, 'enemy', '私のハート', i , '4',fps,writer,match,debug_dir) # シアウルト
+                    result_wo,this_no_start = apex_search(txt, 'enemy', 'ハートを聞き', i , '4',fps,writer,match,debug_dir) # シアウルト
+                    result_wp,this_no_start = apex_search(txt, 'enemy', '美しいですね', i , '4',fps,writer,match,debug_dir) # 敵全滅(シア)
+                    result_wq,this_no_start = apex_search(txt, 'enemy', '美と化し', i , '4',fps,writer,match,debug_dir) # 敵全滅(シア)
+                    result_rev_ult_1,this_no_start = apex_search(txt, 'enemy', '影を', i , '4',fps,writer,match,debug_dir) # レヴナントULT
+                    result_rev_ult_2,this_no_start = apex_search(txt, 'enemy', '受け入れろ', i , '4',fps,writer,match,debug_dir) # レヴナントULT
 
                     # 戦闘状態抽出の共通処理
                     result_in_battle = result_a or result_b or result_c or result_h or result_i or result_j or result_k or result_l or result_m or result_n or result_o or result_p or result_q or result_r or result_s or result_t or result_u or result_v or result_w
@@ -422,22 +431,46 @@ def main():
                             battle_dir, "blackhole_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
                         logger.info("[%4.1f]Use Blackhole [%s, match %s]" % (i/fps,basename, match))
+                    # ヒューズのナックルクラスター
+                    if result_ta:
+                        out_path_image = os.path.join(
+                            battle_dir, "fuse_ability_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        cv2.imwrite(out_path_image,img)
+                        logger.info("[%4.1f]Use Knuckle Cluster [%s, match %s]" % (i/fps,basename, match))
+                    # シアの戦術
+                    if result_wa or reulst_wb or result_wc or result_wd:
+                        out_path_image = os.path.join(
+                            battle_dir, "seer_ability_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        cv2.imwrite(out_path_image,img)
+                        logger.info("[%4.1f]Use Focus of attention [%s, match %s]" % (i/fps,basename, match))
+                    # シアのULT
+                    if result_wn or result_wo:
+                        out_path_image = os.path.join(
+                            battle_dir, "seer_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        cv2.imwrite(out_path_image,img)
+                        logger.info("[%4.1f]Use Showcase [%s, match %s]" % (i/fps,basename, match))
+                    # レヴのULT
+                    if result_rev_ult_1 or result_rev_ult_2:
+                        out_path_image = os.path.join(
+                            battle_dir, "revenant_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        cv2.imwrite(out_path_image,img)
+                        logger.info("[%4.1f]Use Forge Shadow [%s, match %s]" % (i/fps,basename, match))
                     # 味方被弾
-                    if result_l or result_m or result_w:
+                    if result_l or result_la or result_m or result_w or result_ma or result_na or result_nb or result_wg or result_wh or result_wi:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
                             battle_dir, "enemy_member_damaged_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
                         logger.info("[%4.1f]Attacked by enemy [%s, match %s]" % (i/fps,basename, match))
                     # 味方がダウン
-                    if result_n or result_s or result_t:
+                    if result_n or result_s or result_t or result_wm:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
-                            battle_dir, "enemy_member_down_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                            battle_dir, "party_member_down_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
                         logger.info("[%4.1f]Member down [%s, match %s]" % (i/fps,basename, match))
                     # 敵がダメージ
-                    if result_o or result_p or result_q or result_r or result_u or result_v:
+                    if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we of result_wf  or result_wj or result_wk or result_wl or result_wp or result_wq:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
                             battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
