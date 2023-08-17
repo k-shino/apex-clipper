@@ -439,7 +439,7 @@ def main():
                         cv2.imwrite(out_path_image,img)
                         logger.info("[%4.1f]Use Knuckle Cluster [%s, match %s]" % (i/fps,basename, match))
                     # シアの戦術
-                    if result_wa or reulst_wb or result_wc or result_wd:
+                    if result_wa or result_wb or result_wc or result_wd:
                         out_path_image = os.path.join(
                             battle_dir, "seer_ability_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         cv2.imwrite(out_path_image,img)
@@ -471,7 +471,7 @@ def main():
                         cv2.imwrite(out_path_image,img)
                         logger.info("[%4.1f]Member down [%s, match %s]" % (i/fps,basename, match))
                     # 敵がダメージ
-                    if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we of result_wf  or result_wj or result_wk or result_wl or result_wp or result_wq:
+                    if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we or result_wf  or result_wj or result_wk or result_wl or result_wp or result_wq:
                         flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         out_path_image = os.path.join(
                             battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
