@@ -12,10 +12,10 @@ services:
     environment:
       - AUDIO_CHANNEL=<audio>
       - DEBUG_MODE=<debug>
-      - IS_START_DELAY=false
+      - IS_START_DELAY=<delay>
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: <replica>
   # apex_tracker_mount:
   #   volumes:
   #     - ./orig:/root/src_movie/dir02
