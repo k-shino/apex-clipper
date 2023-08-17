@@ -127,57 +127,58 @@ def main():
     # フレーム数を取得
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    logger.warning("frame count: %s" % frame_count)
-    # 1秒あたりフレーム数を取得
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    # logger.info("fps: %s" % fps)
-    logger.warning("fps: %s" % fps)
-    # 1秒に1回予測する
-    skip = int(fps/4)
-    # フレーム
-    i = 0
-    no_start = 0
-    match = 1
-    # 切り出し開始しないカウントダウン
-    
-    if args.skip is None:
-        is_csv_file = os.path.isfile(cut_time_battle_csv)
-        if is_csv_file:
-            if os.path.getsize(cut_time_battle_csv) != 0:
-                last_ocr=tail_pd(cut_time_battle_csv,1)
-                no_start=int(last_ocr[0][0]) * fps
-                match=int(last_ocr[0][2])
+    if frame_count > 0:
+        logger.warning("frame count: %s" % frame_count)
+        # 1秒あたりフレーム数を取得
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        # logger.info("fps: %s" % fps)
+        logger.warning("fps: %s" % fps)
+        # 1秒に1回予測する
+        skip = int(fps/4)
+        # フレーム
+        i = 0
+        no_start = 0
+        match = 1
+        # 切り出し開始しないカウントダウン
+        
+        if args.skip is None:
+            is_csv_file = os.path.isfile(cut_time_battle_csv)
+            if is_csv_file:
+                if os.path.getsize(cut_time_battle_csv) != 0:
+                    last_ocr=tail_pd(cut_time_battle_csv,1)
+                    no_start=int(last_ocr[0][0]) * fps
+                    match=int(last_ocr[0][2])
+            else:
+                no_start = 0
+                match = 1
         else:
-            no_start = 0
-            match = 1
-    else:
-        no_start=args.skip
+            no_start=args.skip
 
-    logger.warning("init no_start / match: %d / %d" % (no_start, match))
+        logger.warning("init no_start / match: %d / %d" % (no_start, match))
 
-    last_time_battle = 0
+        last_time_battle = 0
 
-    flg_in_lobby = False
-    flg_in_battle = False
-    flg_in_result = False
+        flg_in_lobby = False
+        flg_in_battle = False
+        flg_in_result = False
 
-    flg_smooth = True
+        flg_smooth = True
 
-    # 書き出しCSVファイル
-    for i in tqdm(range(frame_count)):
-        # ディレクトリの準備
-        # matchディレクトリ
-        match_dir = base_dir + '/match' + str(match)
-        # battleディレクトリ
-        battle_dir = match_dir + '/battle'
-        # debugディレクトリ
-        debug_dir = match_dir + '/debug'
-        # resultディレクトリ
-        result_dir = match_dir + '/result'
-        os.makedirs(battle_dir, exist_ok=True)
-        os.makedirs(result_dir, exist_ok=True)
-        os.makedirs(debug_dir, exist_ok=True)
-        logger.debug("before read")
+        # 書き出しCSVファイル
+        for i in tqdm(range(frame_count)):
+            # ディレクトリの準備
+            # matchディレクトリ
+            match_dir = base_dir + '/match' + str(match)
+            # battleディレクトリ
+            battle_dir = match_dir + '/battle'
+            # debugディレクトリ
+            debug_dir = match_dir + '/debug'
+            # resultディレクトリ
+            result_dir = match_dir + '/result'
+            os.makedirs(battle_dir, exist_ok=True)
+            os.makedirs(result_dir, exist_ok=True)
+            os.makedirs(debug_dir, exist_ok=True)
+            logger.debug("before read")
 
         # match_dir に、flg_in_progress_matchファイルを作成する
         flg_in_progress_match = os.path.join(match_dir, 'flg_in_progress_match')
@@ -546,25 +547,25 @@ def main():
                     if not flg_in_battle and flg_change_battle:
                         logger.info("[%4.1f][EndLoop]Finish battle [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
-                    # リザルト
-                    if flg_in_result:
-                        logger.info("[%4.1f][EndLoop]Result window [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
-                        out_path_image = os.path.join(
-                            result_dir, "result_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                        cv2.imwrite(out_path_image,img)
+                        # リザルト
+                        if flg_in_result:
+                            logger.info("[%4.1f][EndLoop]Result window [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                            out_path_image = os.path.join(
+                                result_dir, "result_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                            cv2.imwrite(out_path_image,img)
 
-                    # リザルト→ロビー
-                    if not flg_in_result and flg_change_result:
-                        logger.info("[%4.1f][EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                        # リザルト→ロビー
+                        if not flg_in_result and flg_change_result:
+                            logger.info("[%4.1f][EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
-                    save_index += 1
-            if no_start >= 1:
-                no_start -= 1
-            if args.debug:
-                logger.info('time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
-        else:
-            logger.warning("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
-            # break
+                        save_index += 1
+                if no_start >= 1:
+                    no_start -= 1
+                if args.debug:
+                    logger.info('time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
+            else:
+                logger.warning("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
+                # break
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
