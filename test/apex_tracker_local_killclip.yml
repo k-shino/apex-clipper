@@ -12,6 +12,7 @@ services:
     environment:
       - AUDIO_CHANNEL=0
       - DEBUG_MODE=false
+      - IS_START_DELAY=false
     deploy:
       mode: replicated
       replicas: 1
