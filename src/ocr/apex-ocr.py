@@ -435,7 +435,7 @@ def main():
                             cv2.imwrite(out_path_image,img)
                             logger.info("[%4.1f]Use Knuckle Cluster [%s, match %s]" % (i/fps,basename, match))
                         # シアの戦術
-                        if result_wa or reulst_wb or result_wc or result_wd:
+                        if result_wa or result_wb or result_wc or result_wd:
                             out_path_image = os.path.join(
                                 battle_dir, "seer_ability_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                             cv2.imwrite(out_path_image,img)
