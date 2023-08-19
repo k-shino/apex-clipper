@@ -102,8 +102,8 @@ with open(battle_write_log_path, mode='w') as logfile:
 
             for i in tqdm(range(len(sss))):
                 if int(match[i]) == match_num:
-                    # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death
-                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3:
+                    # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death / 8:kill
+                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 8:
                         ss = sss[i]
                         # 録画区間を確定する条件をTrueとする
                         if (float(ss) - float(end) >= cont_duration or int(scene[i]) == 5 or int(scene[i]) == 0 ):
