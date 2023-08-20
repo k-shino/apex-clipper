@@ -479,9 +479,7 @@ else
 fi
 
 
-sort_fname=$(basename "${this_filename}" .mp4)
-
-is_exist=$(find "${this_save_file}" -name "${sort_fname}")
+is_exist=$(find "${export_csv_local_dir}" -name "${this_filename}")
 
 if [ -z "${is_exist}" ]; then
     echo "      Exec: kill_clip $last_src_file $this_start_time $this_duration $this_save_file"
