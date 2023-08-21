@@ -196,7 +196,7 @@ def main():
                         flg_change_result = False
                         flg_change_battle = False
                         if args.debug:
-                        txt = apex_ocr(img, i,fps, 'debug',False, [169,169,169], False, (0, 0, 1920, 1080),debug_dir)  
+                            txt = apex_ocr(img, i,fps, 'debug',False, [169,169,169], False, (0, 0, 1920, 1080),debug_dir)
 
                         ####################################                    
                         # 画面右上通知領域のOCR
