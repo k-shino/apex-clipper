@@ -471,7 +471,7 @@ def main():
                             cv2.imwrite(out_path_image,img)
                             logger.info("[%4.1f]Member down [%s, match %s]" % (i/fps,basename, match))
                         # 敵がダメージ
-                        if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we or result_wf  or result_wj or result_wk or result_wl or result_wp or result_wq:
+                        if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we or result_wf or result_wj or result_wk or result_wl or result_wp or result_wq:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                             out_path_image = os.path.join(
                                 battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -558,10 +558,10 @@ def main():
                             logger.info("[%4.1f][EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
                         save_index += 1
-                    if no_start >= 1:
-                        no_start -= 1
-                    if args.debug:
-                        logger.info('time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
+                if no_start >= 1:
+                    no_start -= 1
+                if args.debug:
+                    logger.info('time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
             else:
                 logger.warning("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
                 # break
