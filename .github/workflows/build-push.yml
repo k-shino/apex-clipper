@@ -101,27 +101,15 @@ jobs:
     needs: build-amd64
     strategy:
       matrix:
-        filename: ['nospace.mp4','test with space.mp4']
+        include:
+          - mode: ocr
+            target: clip
+            audio: 1
+            expected_result: 1
+            debug: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          lfs: true
-      - name: change filename
-        run: |
-          mv "./test/orig/2023-08-15_23-10-48.mp4" "./test/orig/${{matrix.filename}}"
-      - name: cleanup ocrdir
-        run: |
-          rm -rf ./test/ocr
-          mkdir -p ./test/ocr
-      - name: customize mode
-        run: |
-          set -x
-          sed -i -e 's#<mode>#ocr#' ./test/apex_tracker.yml
-          sed -i -e 's#<replica>#4#' ./test/apex_tracker.yml
-          sed -i -e 's#<delay>#true#' ./test/apex_tracker.yml
-          sed -i -e 's#<debug>#false#' ./test/apex_tracker.yml
-          cat ./test/apex_tracker.yml
       - name: customize imagetag
         run: |
           set -x
@@ -129,38 +117,14 @@ jobs:
           cat ./test/apex_tracker.yml
       - name: test
         run: |
-          docker-compose -f ./test/apex_tracker.yml up
-      - name: check if file_error detected
-        run: |
-          find ./test/ocr/corruptmovie -name 'file_error' | grep -c 'file_error'
-      - name: kill leader detect check (failure)
-        run: |
-          cnt=$(grep -c ',8,' ./test/ocr/2023-08-15_23-10-50/cut_time_battle.csv || true)
-          if [ $cnt -ne 0 ]; then
-            echo "[ERROR] 2023-08-15_23-10-50/cut_time_battle.csv have kill(8) record."
-            exit 1
-          fi
-      - name: kill leader detect check
-        run: |
-          cnt=$(grep -c ',8,' ./test/ocr/2023-08-15_23-10-49/cut_time_battle.csv || true)
-          if [ $cnt -eq 0 ]; then
-            echo "[ERROR] 2023-08-15_23-10-49/cut_time_battle.csv doesn't have kill record."
-            exit 1
-          fi
-      - name: check file_error
-        run: |
-          cnt=$(find ./test/ocr -name "file_error" | grep -c file_error || true)
-          if [ $cnt -eq 0 ]; then
-            echo "[ERROR] file_error detected"
-            find ./test/ocr -name "file_error"
-            exit 1
-          fi
-      - name: save ocr artifact
+          cd test
+          ./test-action.sh
+      - name: save artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ocr-result
+          name: result_mode-${{matrix.mode}}_target-${{matrix.target}}_audio-${{matrix.audio}}_result-${{matrix.expected_result}}_debug-${{matrix.debug}}
           path: |
-            test/ocr/*/cut_time_battle.csv
+            test/tmp/*
           retention-days: 1
       # - name: save output artifact
       #   uses: actions/upload-artifact@v3
