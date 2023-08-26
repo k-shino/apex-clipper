@@ -424,15 +424,15 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip_foreach' ]; then
 
         # 元の動画ファイルのサイズを確認し、$file_lockedにサイズ値を格納する。
         # サイズ値が次回以降のループ時に不一致になった場合、$export_dirを初期化する
-        file_size=$(ls -al /root/src_movie/*/"${filename}"* | awk '{print $5}')
-        if [ -f "$file_locked" ]; then
-            if [ "$(cat "$file_locked")" != "$file_size" ]; then
-                echo "  apex-tracker: rm ${export_dir} [may video files has'nt finalized yet] (file_size=${file_size}, file_locked=$(cat "${file_locked}"))"
-                rm -rf "${export_dir}"
-                mkdir -p "${export_dir}"
-            fi
-        fi
-        echo -n "$file_size" > "$file_locked"
+        # file_size=$(ls -al /root/src_movie/*/"${filename}"* | awk '{print $5}')
+        # if [ -f "$file_locked" ]; then
+        #     if [ "$(cat "$file_locked")" != "$file_size" ]; then
+        #         echo "  apex-tracker: rm ${export_dir} [may video files has'nt finalized yet] (file_size=${file_size}, file_locked=$(cat "${file_locked}"))"
+        #         rm -rf "${export_dir}"
+        #         mkdir -p "${export_dir}"
+        #     fi
+        # fi
+        # echo -n "$file_size" > "$file_locked"
 
         # if [ ! -f $check_csv_battle ]; then
         #     python /root/apex-ocr.py $file -o $OUT_PATH 
