@@ -133,8 +133,11 @@ def main():
         fps = cap.get(cv2.CAP_PROP_FPS)
         # logger.info("fps: %s" % fps)
         logger.warning("fps: %s" % fps)
-        # 1秒に1回予測する
-        skip = int(fps/4)
+        # 1秒に4回予測する.debug時は1秒に1回
+        if not args.debug:
+            skip = int(fps/4)
+        else:
+            skip = int(fps)
         # フレーム
         i = 0
         no_start = 0
@@ -488,6 +491,8 @@ def main():
                         result_b,this_no_start = apex_search(txt, 'result', 'マッチリザルト', i , '0',fps,writer,match,debug_dir)
                         result_c,this_no_start = apex_search(txt, 'result', '全滅', i , '0',fps,writer,match,debug_dir)
                         result_d,this_no_start = apex_search(txt, 'result', '隊全', i , '0',fps,writer,match,debug_dir)
+                        result_lobby1,this_no_start = apex_search(txt, 'lobby', '戦績を', i , '0',fps,writer,match,debug_dir)
+                        result_lobby2,this_no_start = apex_search(txt, 'lobby', '表示', i , '0',fps,writer,match,debug_dir)
                         result = result_a or result_b or result_c or result_d
                         if result:
                             no_start = max(int(fps * skip_after_scan), no_start)
@@ -499,6 +504,14 @@ def main():
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,True)
                             last_time_battle = 0
                             logger.info("[%4.1f]Show result [%s, match %s]" % (i/fps,basename, match))
+
+                        # ロビー画面に戻る
+                        if result_lobby1 or result_lobby2:
+                            logger.info("In lobby [%s, match %s]" % (basename, match))
+                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
+                            flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,True)
+                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+
 
                         #################################
                         # 一通りのOCR終了後の処理
