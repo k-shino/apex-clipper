@@ -158,6 +158,11 @@ jobs:
       - name: test
         run: |
           cd test
+          export mode=${{matrix.mode}}
+          export target=${{matrix.target}}
+          export audio=${{matrix.audio}}
+          export expected_result=${{matrix.expected_result}}
+          export debug=${{matrix.debug}}
           ./test-action.sh
       - name: save artifact
         uses: actions/upload-artifact@v3
