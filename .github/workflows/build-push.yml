@@ -169,7 +169,7 @@ jobs:
         with:
           name: result_mode-${{matrix.mode}}_target-${{matrix.target}}_audio-${{matrix.audio}}_result-${{matrix.expected_result}}_debug-${{matrix.debug}}
           path: |
-            test/tmp/ocr/*
+            test/tmp/ocr/2023-08-01_10-00-00/cut_time_battle.csv
             test/tmp/out/*
             test/tmp/apex_kill_clip/*
           retention-days: 1
