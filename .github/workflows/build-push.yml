@@ -95,33 +95,61 @@ jobs:
           platforms: linux/arm64
           context: ${{env.context}}
           file: ${{env.dockerfile_arm64}}
-  test-amd64-ocr:
+  test-amd64:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     needs: build-amd64
     strategy:
       matrix:
-        filename: ['nospace.mp4','test with space.mp4']
+        include:
+          - mode: ocr
+            target: clip
+            audio: 1
+            expected_result: 0
+            debug: false
+          - mode: ocr
+            target: kill_failure
+            audio: 1
+            expected_result: 0
+            debug: false
+          - mode: ocr
+            target: kill_success
+            audio: 1
+            expected_result: 17
+            debug: false
+          - mode: match_clip
+            target: clip
+            audio: 0
+            expected_result: 1
+            debug: false
+          - mode: match_clip
+            target: switch
+            audio: 0
+            expected_result: 2
+            debug: false
+          - mode: match_clip_foreach
+            target: clip
+            audio: 0
+            expected_result: 1
+            debug: false
+          - mode: match_clip_foreach
+            target: switch
+            audio: 0
+            expected_result: 2
+            debug: false
+          - mode: kill_clip
+            target: kill_success
+            audio: 0
+            expected_result: 1
+            debug: false
+          - mode: kill_clip
+            target: kill_failure
+            audio: 0
+            expected_result: 0
+            debug: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          lfs: true
-      - name: change filename
-        run: |
-          mv "./test/orig/2023-08-15_23-10-48.mp4" "./test/orig/${{matrix.filename}}"
-      - name: cleanup ocrdir
-        run: |
-          rm -rf ./test/ocr
-          mkdir -p ./test/ocr
-      - name: customize mode
-        run: |
-          set -x
-          sed -i -e 's#<mode>#ocr#' ./test/apex_tracker.yml
-          sed -i -e 's#<replica>#4#' ./test/apex_tracker.yml
-          sed -i -e 's#<delay>#true#' ./test/apex_tracker.yml
-          sed -i -e 's#<debug>#false#' ./test/apex_tracker.yml
-          cat ./test/apex_tracker.yml
       - name: customize imagetag
         run: |
           set -x
@@ -129,154 +157,19 @@ jobs:
           cat ./test/apex_tracker.yml
       - name: test
         run: |
-          docker-compose -f ./test/apex_tracker.yml up
-      - name: check if file_error detected
-        run: |
-          find ./test/ocr/corruptmovie -name 'file_error' | grep -c 'file_error'
-      - name: kill leader detect check (failure)
-        run: |
-          cnt=$(grep -c ',8,' ./test/ocr/2023-08-15_23-10-50/cut_time_battle.csv || true)
-          if [ $cnt -ne 0 ]; then
-            echo "[ERROR] 2023-08-15_23-10-50/cut_time_battle.csv have kill(8) record."
-            exit 1
-          fi
-      - name: kill leader detect check
-        run: |
-          cnt=$(grep -c ',8,' ./test/ocr/2023-08-15_23-10-49/cut_time_battle.csv || true)
-          if [ $cnt -eq 0 ]; then
-            echo "[ERROR] 2023-08-15_23-10-49/cut_time_battle.csv doesn't have kill record."
-            exit 1
-          fi
-      - name: check file_error
-        run: |
-          cnt=$(find ./test/ocr -name "file_error" | grep -c file_error || true)
-          if [ $cnt -eq 0 ]; then
-            echo "[ERROR] file_error detected"
-            find ./test/ocr -name "file_error"
-            exit 1
-          fi
-      - name: save ocr artifact
+          cd test
+          export mode=${{matrix.mode}}
+          export target=${{matrix.target}}
+          export audio=${{matrix.audio}}
+          export expected_result=${{matrix.expected_result}}
+          export debug=${{matrix.debug}}
+          ./test-action.sh
+      - name: save artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ocr-result
+          name: result_mode-${{matrix.mode}}_target-${{matrix.target}}_audio-${{matrix.audio}}_result-${{matrix.expected_result}}_debug-${{matrix.debug}}
           path: |
-            test/ocr/*/cut_time_battle.csv
-          retention-days: 1
-      # - name: save output artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: result movie
-      #     path: |
-      #       test/work/*/create_match_clip.log
-      #       test/out/*.mp4
-      #       test/apex_kill_clip/*.mp4
-      #     retention-days: 1
-  test-amd64-ffmpeg:
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
-    needs: build-amd64
-    strategy:
-      matrix:
-        filename: ['nospace.mp4','test with space.mp4','ocr_in_progress.mp4']
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          lfs: true
-      - name: change filename
-        run: |
-          mv "./test/orig/2023-08-15_23-10-48.mp4" "./test/orig/${{matrix.filename}}"
-      - name: customize mode
-        run: |
-          set -x
-          sed -i -e 's#<mode>#match_clip#' ./test/apex_tracker.yml
-          sed -i -e 's#<debug>#false#' ./test/apex_tracker.yml
-          sed -i -e 's#<replica>#2#' ./test/apex_tracker.yml
-          sed -i -e 's#<delay>#false#' ./test/apex_tracker.yml
-          sed -i -e 's#<audio>#0#' ./test/apex_tracker.yml
-          cat ./test/apex_tracker.yml
-      - name: customize imagetag
-        run: |
-          set -x
-          sed -i -e 's#<image-tag>#${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}#' ./test/apex_tracker.yml
-          cat ./test/apex_tracker.yml
-      - name: test
-        run: |
-          docker-compose -f ./test/apex_tracker.yml up
-      # - name: save ocr artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: ocr-result
-      #     path: |
-      #       test/ocr/*/cut_time_battle.csv
-      #     retention-days: 1
-      - name: check result files
-        if: ${{ matrix.filename != 'ocr_in_progress.mp4' }}
-        run: |
-          find ./test/out -name '*.mp4' | grep -c mp4
-      - name: check if ocr in progress is skipped
-        if: ${{ matrix.filename == 'ocr_in_progress.mp4' }}
-        continue-on-error: true
-        id: ocr-in-progress
-        run: |
-          find ./test/work/ocr_in_progress -name '*flg_extracted' | grep -c flg_extracted
-      - name: run if ocr-in-progress success
-        if: ${{ steps.ocr-in-progress.outcome == 'success' && matrix.filename == 'ocr_in_progress.mp4' }}
-        run: exit 1
-      - name: save output artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: result movie
-          path: |
-            test/work/*/create_match_clip.log
-            test/out/*.mp4
-          retention-days: 1
-
-  test-amd64-ffmpeg-killclip:
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
-    needs: build-amd64
-    strategy:
-      matrix:
-        #filename: ['nospace.mp4']
-        audio: ['0']
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          lfs: true
-      # - name: change filename
-      #   run: |
-      #     mv "./test/orig/2023-08-15_23-10-48.mp4" "./test/orig/${{matrix.filename}}"
-      - name: customize mode
-        run: |
-          set -x
-          sed -i -e 's#<mode>#kill_clip#' ./test/apex_tracker.yml
-          sed -i -e 's#<debug>#false#' ./test/apex_tracker.yml
-          sed -i -e 's#<delay>#false#' ./test/apex_tracker.yml
-          sed -i -e 's#<replica>#1#' ./test/apex_tracker.yml
-          sed -i -e 's#<audio>#${{matrix.audio}}#' ./test/apex_tracker.yml
-          cat ./test/apex_tracker.yml
-      - name: customize imagetag
-        run: |
-          set -x
-          sed -i -e 's#<image-tag>#${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}#' ./test/apex_tracker.yml
-          cat ./test/apex_tracker.yml
-      - name: test
-        run: |
-          docker-compose -f ./test/apex_tracker.yml up
-      - name: check result files
-        run: |
-          find ./test/apex_kill_clip -name '*.mp4' | grep -c mp4
-      # - name: check if ocr in progress is skipped
-      #   continue-on-error: true
-      #   id: ocr-in-progress
-      #   run: |
-      #     find ./test/work/ocr_in_progress -name '*flg_extracted' | grep -c flg_extracted
-      - name: save output artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: result movie
-          path: |
-            test/apex_kill_clip/**/*.mp4
+            test/tmp/ocr/2023-08-01_10-00-00/cut_time_battle.csv
+            test/tmp/out/*
+            test/tmp/apex_kill_clip/*
           retention-days: 1
