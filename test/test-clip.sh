@@ -15,3 +15,10 @@ export expected_result=1
 
 ./test-action.sh
 
+export target=switch
+export mode=match_clip_foreach
+export audio=0
+export expected_result=2
+
+./test-action.sh
+
