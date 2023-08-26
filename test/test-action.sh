@@ -42,6 +42,15 @@ echo "run docker:"
 
 docker-compose -f apex_tracker_tmp.yml up
 
+if [ "$mode" == "ocr" ]; then
+    echo "Check if kill scene is counted"
+    result_num=$(cat ocr/${dummy_date}/cut_time_battle.csv | grep -c ,8, || true)
+    if [ ${result_num} -ne ${expected_result} ]; then
+        echo "[ERROR] Num of kill scene doesn't match. [$result_num != $expected_result]"
+        exit 1
+    fi
+fi
+
 if [ "$mode" == "match_clip" ]|| [ "$mode" == "match_clip_foreach" ]; then
     echo "Check if merge file is created"
     result_num=$(find . -name "${dummy_date}_*_merge.mp4" | grep -c "mp4" || true)
