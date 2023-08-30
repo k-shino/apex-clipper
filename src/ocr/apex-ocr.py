@@ -351,7 +351,7 @@ def main():
                         txt = apex_ocr(img,i,fps, 'subtitle',False, [169,169,169], True, (500, 810, 1406, 930),debug_dir)
                         if args.debug:
                             apex_search(txt, 'subtitle', '発見', i , '4',fps,writer,match,debug_dir)
-                        result_a,this_no_start = apex_search(txt, 'kdown', 'ノックダウン', i , '4',fps,writer,match,debug_dir)
+                        result_a,this_no_start = apex_search(txt, 'kdown', 'ノックダウン', i , '4',fps,writer,match,debug_dir,['ダウンシールド'])
                         result_c,this_no_start = apex_search(txt, 'kill', '自己復活', i , '8',fps,writer,match,debug_dir)
                         result_d,this_no_start = apex_search(txt, 'other', 'ホールド', i , '3',fps,writer,match,debug_dir)
                         result_e,this_no_start = apex_search(txt, 'other', '同行', i , '3',fps,writer,match,debug_dir)
@@ -405,7 +405,16 @@ def main():
                         result_lf_2,this_no_start = apex_search(txt, 'enemy', '攻撃中', i , '4',fps,writer,match,debug_dir) # 攻撃(ライフライン)
                         result_pf_2,this_no_start = apex_search(txt, 'enemy', '割った', i , '4',fps,writer,match,debug_dir) # 敵発見(パスファインダー)
                         result_cl_1,this_no_start = apex_search(txt, 'enemy', 'フラグを', i , '4',fps,writer,match,debug_dir) # 攻撃(カタリスト)
-                        result_cl_2,this_no_start = apex_search(txt, 'enemy', 'シールドを', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
+                        result_cl_2,this_no_start = apex_search(txt, 'enemy', 'シールドを回', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
+                        result_cl_3,this_no_start = apex_search(txt, 'enemy', '敵がい', i , '4',fps,writer,match,debug_dir) # 敵発見(カタリスト)
+                        result_cl_4,this_no_start = apex_search(txt, 'enemy', 'シールドをリ', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
+                        result_cl_5,this_no_start = apex_search(txt, 'enemy', 'シールドを砕', i , '4',fps,writer,match,debug_dir) # シールド破壊（カタリスト）
+                        result_cl_ult_1,this_no_start = apex_search(txt, 'enemy', '鉄よ', i , '12',fps,writer,match,debug_dir) # カタリストULT
+                        result_cl_ult_2,this_no_start = apex_search(txt, 'enemy', 'アタシに従え', i , '12',fps,writer,match,debug_dir) # カタリストULT
+                        result_cl_ult_3,this_no_start = apex_search(txt, 'enemy', '鋼よ', i , '12',fps,writer,match,debug_dir) # カタリストULT
+                        result_cl_ult_4,this_no_start = apex_search(txt, 'enemy', '我々を守れ', i , '12',fps,writer,match,debug_dir) # カタリストULT
+                        result_cl_ult_5,this_no_start = apex_search(txt, 'enemy', 'バリケードを形成', i , '12',fps,writer,match,debug_dir) # カタリストULT
+                        result_cl_ult_6,this_no_start = apex_search(txt, 'enemy', 'サポートフォーメーション', i , '12',fps,writer,match,debug_dir) # カタリストULT
 
                         # 戦闘状態抽出の共通処理
                         result_in_battle = result_a or result_c or result_h or result_j or result_k or result_l or result_m or result_n or result_o or result_p or result_q or result_r or result_s or result_t or result_u or result_v or result_w
@@ -521,6 +530,19 @@ def main():
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+
+                        # カタリストのULT
+                        if result_cl_ult_1 or result_cl_ult_2 or result_cl_ult_3 or result_cl_ult_4 or result_cl_ult_5 or result_cl_ult_6:
+                            out_path_image = os.path.join(
+                                battle_dir, "catalyst_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                            cv2.imwrite(out_path_image,img)
+                            logger.info("[%4.1f]Use Dark Evil [%s, match %s]" % (i/fps,basename, match))
+                            no_start = max(int(fps * skip_after_scan), no_start)
+                            last_time_battle = i
+                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
+                            flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+
                         # 味方被弾
                         if result_l or result_la or result_m or result_w or result_ma or result_na or result_nb or result_wg or result_wh or result_wi:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -558,7 +580,7 @@ def main():
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
                         # 敵発見
-                        if result_lf_1:
+                        if result_lf_1 or result_cl_3:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                             out_path_image = os.path.join(
                                 battle_dir, "enemy_found_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -570,8 +592,21 @@ def main():
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
+                        # 回復
+                        if result_cl_2 or result_cl_4:
+                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
+                            out_path_image = os.path.join(
+                                battle_dir, "shield_rechaging_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                            cv2.imwrite(out_path_image,img)
+                            logger.info("[%4.1f]Rechaging shield [%s, match %s]" % (i/fps,basename, match))
+                            no_start = max(int(fps * skip_after_scan), no_start)
+                            last_time_battle = i
+                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
+                            flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+
                         # 敵シールド破壊
-                        if result_pf_2 or result_pf_2:
+                        if result_pf_2 or result_cl_5:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                             out_path_image = os.path.join(
                                 battle_dir, "break_enemy_shield_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -633,7 +668,8 @@ def main():
                         txt = apex_ocr(img,i,fps, 'bottom_left',False, [110,110,255], True, (40, 1030, 256, 1072),debug_dir)
                         if args.debug:
                             apex_search(txt, 'bottom_left', '発見', i , '4',fps,writer,match,debug_dir)
-                        result_map,this_no_start = apex_search(txt, 'map', 'マップ', i , '0',fps,writer,match,debug_dir)
+                        result_map,this_no_start = apex_search(txt, 'map', 'マップ', i , '10',fps,writer,match,debug_dir)
+                        result_spectate,this_no_start = apex_search(txt, 'spectate', 'プレイヤー', i , '11',fps,writer,match,debug_dir)
 
                         # マップ画面
                         if result_map:
@@ -643,7 +679,16 @@ def main():
                             cv2.imwrite(out_path_image,img)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
 
-
+                        # 観戦中
+                        if result_spectate:
+                            logger.info("[%4.1f]Spectate [%s, match %s]" % (i/fps,basename, match))
+                            out_path_image = os.path.join(
+                                result_dir, "spectate_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                            cv2.imwrite(out_path_image,img)
+                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
+                            flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+                            last_time_battle = i # 観戦後、復帰したとしても直後のクリップ出力は不要なので、最後に観戦状態だったあとの16秒間はSkip
 
                         #################################
                         # 一通りのOCR終了後の処理
