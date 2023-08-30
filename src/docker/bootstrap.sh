@@ -239,7 +239,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
 fi
 
 # マッチクリップの作成
-if [ "$MODE" == 'match_clip' ]; then
+if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
     echo "---------------------------------------------------"
     echo "Create match-clip phase"
     echo "---------------------------------------------------"
@@ -392,7 +392,7 @@ fi
 
 
 # マッチクリップの作成
-if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip_foreach' ]; then
+if [ "$MODE" == 'match_clip_foreach' ]; then
     echo "---------------------------------------------------"
     echo "Create match-clip phase(foreach option)"
     echo "---------------------------------------------------"
@@ -550,7 +550,7 @@ fi
 
 
 # リザルトをファイル名に付与
-if [ $MODE == 'all' -o $MODE == 'add_result' ]; then
+if [ $MODE == 'all' ] || [ $MODE == 'add_result' ]; then
     echo "---------------------------------------------------"
     echo "Add battle result phase"
     echo "---------------------------------------------------"
@@ -560,7 +560,7 @@ if [ $MODE == 'all' -o $MODE == 'add_result' ]; then
 fi
 
 # キルクリップ
-if [ $MODE == 'all' -o $MODE == 'kill_clip' ]; then
+if [ $MODE == 'all' ] || [ $MODE == 'kill_clip' ]; then
     echo "---------------------------------------------------"
     echo "Create kill clip phase"
     echo "---------------------------------------------------"
