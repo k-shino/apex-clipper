@@ -206,7 +206,8 @@ do
 
                         while IFS=',' read -ra fields; do
                             
-                            if [ "${fields[1]}" -eq 8 ]; then
+                            # kill , championを抽出する（暫定）
+                            if [ "${fields[1]}" -eq 8 ] || [ "${fields[1]}" -eq 9 ]; then
 
                                 ################################
                                 # 動画ファイルのUNIX TIMEを出力
