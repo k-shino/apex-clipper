@@ -102,12 +102,12 @@ with open(battle_write_log_path, mode='w') as logfile:
 
             for i in tqdm(range(len(sss))):
                 if int(match[i]) == match_num:
-                    # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death / 8:kill
-                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 8:
+                    # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death / 8:kill / 9:champion
+                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 8 or int(scene[i]) == 9:
                         ss = sss[i]
                         # 録画区間を確定する条件をTrueとする
-                        if (float(ss) - float(end) >= cont_duration or int(scene[i]) == 5 or int(scene[i]) == 0 ):
-                            if int(scene[i]) == 5 or int(scene[i]) == 0:
+                        if (float(ss) - float(end) >= cont_duration or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9):
+                            if int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8:
                                 # if len(sss) > i+1:
                                 #     if int(scene[i] == 5) and int(scene[i+1] == 0):
                                 #         end = float(sss[i+1]) + death_after_sec
@@ -117,7 +117,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                                 #     end = float(ss) + death_after_sec
                                 end = float(sss[i]) + death_after_sec
                                 j=i+1
-                                while len(sss) > j and (int(scene[j]) == 5 or int(scene[j]) == 0):
+                                while len(sss) > j and (int(scene[j]) == 5 or int(scene[j]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8):
                                     end = float(sss[j]) + death_after_sec
                                     j+=1
                             else:
@@ -134,7 +134,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                             # # 戦闘中の場合は最低録画時間をbattle_min_recとする．（試合終了の場合はbattle_final_rec）
                             # else:
                             #     duration = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
-                            if int(scene[i]) == 5:
+                            if int(scene[i]) == 5 or int(scene[i]) == 9 or int(scene[i]) == 8 :
                                 duration = max(float(end) - float(start) + before_scene_sec, battle_final_rec)
                             else:
                                 duration = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
@@ -171,14 +171,14 @@ with open(battle_write_log_path, mode='w') as logfile:
                                 # subprocess.run(command, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
                                 subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
 
-                            if int(scene[i]) == 5 or int(scene[i]) == 0:
+                            if int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8:
                                 start = -1
                             else:
                                 start = float(ss)
                             end = ss
                         else:
                             end = ss
-                            if start == -1 and not ( int(scene[i]) == 5 or int(scene[i]) == 0 ):
+                            if start == -1 and not ( int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8):
                                 start = float(ss)
                         #log = "  [DEBUG] ss:%s start:%s end:%s scene:%s" % (ss, start, end, scene[i])
                         #print(log)

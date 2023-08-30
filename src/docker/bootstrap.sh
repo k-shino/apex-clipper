@@ -485,6 +485,13 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip_foreach' ]; then
                     do
                     # for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
                     # do
+                        
+                        count_movie_file=$(find /root/work -name "*.mp4" | grep -c .mp4 || true)
+                        if [ $count_movie_file -eq 0 ]; then
+                            echo "No movie file is exported. merge process is skipped."
+                            exit 0
+                        fi
+                        
                         echo "      -----------------------------------------"
                         echo "      start merge clips match $match"
                         echo "      -----------------------------------------"
