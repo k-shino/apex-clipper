@@ -15,6 +15,7 @@ export csv_file=${csv_file:-cut_time_battle.csv}
 export MODE=${MODE:-all}
 export FORCE_PARAM=false
 export DEBUG_MODE=${DEBUG_MODE:-false}
+export SKIP_IMAGE_EXPORT=${SKIP_IMAGE_EXPORT:-false}
 
 export IS_START_DELAY=${IS_START_DELAY:-true}
 
@@ -59,6 +60,10 @@ do
             ;;
         '--debug' )
             DEBUG_MODE=true
+            shift 1
+            ;;
+        '--imageexport' )
+            SKIP_IMAGE_EXPORT=true
             shift 1
             ;;
         '--revert' )
@@ -205,6 +210,10 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
 
                     if "$DEBUG_MODE"; then
                         EXEC_ARGS="$EXEC_ARGS --debug"
+                    fi
+
+                    if "$SKIP_IMAGE_EXPORT"; then
+                        EXEC_ARGS="$EXEC_ARGS --skipimage"
                     fi
 
                     echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
