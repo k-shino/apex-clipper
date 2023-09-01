@@ -678,6 +678,7 @@ def main():
                                 result_dir, "map_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                             cv2.imwrite(out_path_image,img)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
                         # 観戦中
                         if result_spectate:
