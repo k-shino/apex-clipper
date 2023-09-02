@@ -766,9 +766,11 @@ def main():
                             debug_dir = match_dir + '/debug'
                             # resultディレクトリ
                             result_dir = match_dir + '/result'
-                            os.makedirs(battle_dir, exist_ok=True)
-                            os.makedirs(result_dir, exist_ok=True)
-                            os.makedirs(debug_dir, exist_ok=True)
+                            if not args.skipimage:
+                                os.makedirs(battle_dir, exist_ok=True)
+                                os.makedirs(result_dir, exist_ok=True)
+                                if args.debug:
+                                    os.makedirs(debug_dir, exist_ok=True)
                             # with open(flg_in_progress, mode='w') as f:
                             #     f.write(str(i))
                         # 戦闘終了
