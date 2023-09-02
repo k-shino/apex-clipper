@@ -295,40 +295,40 @@ with open(battle_write_log_path, mode='w') as logfile:
                 print(log)
                 logfile.write(log+'\n')
 
-            # csvファイルを一通り捜査した後の録画処理
-            if not start == -1:
+            # # csvファイルを一通り捜査した後の録画処理
+            # if not start == -1:
 
-                log = "[DEBUG] i = %s, scene = %s" % (i,scene[i])
-                print(log)
-                logfile.write(log+'\n')
+            #     log = "[DEBUG] i = %s, scene = %s" % (i,scene[i])
+            #     print(log)
+            #     logfile.write(log+'\n')
 
-                end = float(end) + float(cut_duration_battle)
-                duration = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
-                log = "Export battle scene %d from %.2f sec for %.2f sec from %s" % (int(i),float(start),float(duration),src_movie)
-                print(log)
-                match_dir = battle_work_dir + '/match' + match[i] + '/rec'
-                os.makedirs(match_dir, exist_ok=True)
-                # os.makedirs('/rec', exist_ok=True)
-                logfile.write(log+'\n')
+            #     end = float(end) + float(cut_duration_battle)
+            #     duration = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
+            #     log = "Export battle scene %d from %.2f sec for %.2f sec from %s" % (int(i),float(start),float(duration),src_movie)
+            #     print(log)
+            #     match_dir = battle_work_dir + '/match' + match[i] + '/rec'
+            #     os.makedirs(match_dir, exist_ok=True)
+            #     # os.makedirs('/rec', exist_ok=True)
+            #     logfile.write(log+'\n')
 
-                # if args.debug:
-                #     duration=5
-                #     log = "  [DEBUG] rec duration: %f " % (duration)
-                #     print(log)
-                #     logfile.write(log+'\n')
+            #     # if args.debug:
+            #     #     duration=5
+            #     #     log = "  [DEBUG] rec duration: %f " % (duration)
+            #     #     print(log)
+            #     #     logfile.write(log+'\n')
 
-                if args.audio:
-                    command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:%s -acodec copy -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, args.audio ,match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
-                else:
-                    command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:1 -map 0:a:2 -map 0:a:3 -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
-                log = "  [DEBUG] ffmpeg command: %s" % (command)
-                print(log)
-                logfile.write(log+'\n')
-                subprocess.run(command, shell=True)
-                subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
+            #     if args.audio:
+            #         command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:%s -acodec copy -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, args.audio ,match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
+            #     else:
+            #         command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:1 -map 0:a:2 -map 0:a:3 -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
+            #     log = "  [DEBUG] ffmpeg command: %s" % (command)
+            #     print(log)
+            #     logfile.write(log+'\n')
+            #     subprocess.run(command, shell=True)
+            #     subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
 
-            subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
-            #shutil.move('/rec', match_dir)
+            # subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
+            # #shutil.move('/rec', match_dir)
 
     logfile.close
 
