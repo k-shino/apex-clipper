@@ -8,6 +8,7 @@ audio=${audio:-1}
 expected_result=${expected_result:-1}
 debug=${debug:-false}
 ocr_in_progress=${ocr_in_progress:-false}
+skipimage=${skipimage:-false}
 
 dummy_date="2023-08-01_10-00-00"
 
@@ -45,6 +46,8 @@ sed -i -e "s/<audio>/${audio}/" apex_tracker_tmp.yml
 sed -i -e "s/<debug>/${debug}/" apex_tracker_tmp.yml
 sed -i -e "s/<delay>/false/" apex_tracker_tmp.yml
 sed -i -e "s/<replica>/1/" apex_tracker_tmp.yml
+sed -i -e "s/<skipimage>/${skipimage}/" apex_tracker_tmp.yml
+
 
 echo "docker-compose yaml:"
 cat apex_tracker_tmp.yml

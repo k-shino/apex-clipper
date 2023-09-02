@@ -13,6 +13,7 @@ services:
       - AUDIO_CHANNEL=<audio>
       - DEBUG_MODE=<debug>
       - IS_START_DELAY=<delay>
+      - SKIP_IMAGE_EXPORT=<skipimage>
     deploy:
       mode: replicated
       replicas: <replica>
