@@ -12,6 +12,8 @@ from tqdm import tqdm
 import numpy as np
 # from logging import StreamHandler, Formatter, INFO, getLogger
 import logging
+from logging import StreamHandler, FileHandler, Formatter
+from logging import INFO, DEBUG, NOTSET
 import pandas as pd
 import pyocr
 import pyocr.builders
@@ -34,7 +36,7 @@ def pil2cv(imgPIL):
 def change_flg(name,flg,change_bool,bool):
     ret_flg = change_bool
     if flg ^ bool:
-        logger.warning("Switch flg %s from %s to %s" % (name, flg, bool))
+        logger.debug("Switch flg %s from %s to %s" % (name, flg, bool))
         ret_flg = True
     return bool, ret_flg
 
@@ -111,8 +113,7 @@ def apex_search(txt, type, search_text, cnt, status_dict, fps,writer,match,battl
             # シーン判定をしばらく止める
             ret_no_start = int(fps * skip_after_scan)
             ret_result = True
-            if args.debug:
-                logger.info("[%4.1f]  in apex search: find text %s (status: %s) [%s, match %s]" % (cnt/fps, search_text, status_dict, basename, match))
+            logger.debug("[%4.1f]  in apex search: find text %s (status: %s) [%s, match %s]" % (cnt/fps, search_text, status_dict, basename, match))
     return ret_result, ret_no_start
 
 def main():
@@ -122,17 +123,16 @@ def main():
     # 動画を読み込む
     cap = cv2.VideoCapture(src_movie)
     if not cap.isOpened():
-        logger.warning('cv2 exception error')
+        logger.error('cv2 exception error')
         sys.exit(1)
     # フレーム数を取得
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     if frame_count > 0:
-        logger.warning("frame count: %s" % frame_count)
+        logger.debug("frame count: %s" % frame_count)
         # 1秒あたりフレーム数を取得
         fps = cap.get(cv2.CAP_PROP_FPS)
-        # logger.info("fps: %s" % fps)
-        logger.warning("fps: %s" % fps)
+        logger.debug("fps: %s" % fps)
         # 1秒に4回予測する.debug時は1秒に1回
         if not args.debug:
             skip = int(fps/4)
@@ -157,7 +157,7 @@ def main():
         else:
             no_start=args.skip
 
-        logger.warning("init no_start / match: %d / %d" % (no_start, match))
+        logger.info("init no_start / match: %d / %d" % (no_start, match))
 
         last_time_battle = 0
 
@@ -186,14 +186,11 @@ def main():
                 if args.debug:
                     os.makedirs(debug_dir, exist_ok=True)
 
-            logger.debug("before read")
-
             # match_dir に、flg_in_progress_matchファイルを作成する
             flg_in_progress_match = os.path.join(match_dir, 'flg_in_progress_match')
             pathlib.Path(flg_in_progress_match).touch()
 
             ret, frame = cap.read()
-            # logger.info("frame : %s" % frame)
             if ret:
                 # if ( i >= 3251*fps and i % skip == 0 and no_start == 0 ) or not flg_smooth:
                 if i % skip == 0 and ( int(no_start) == 0 or not flg_smooth):
@@ -748,7 +745,7 @@ def main():
 
                         # ロビー　→　マッチ開始の処理
                         if not flg_in_lobby and flg_change_lobby:
-                            logger.info("[%4.1f][EndLoop]Start new match [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                            logger.warning("[%4.1f][EndLoop]Start new match [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
                             # flg_in_progress_matchファイルを削除
                             if os.path.exists(flg_in_progress_match):
@@ -789,15 +786,14 @@ def main():
                             logger.info("[%4.1f][EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
                         save_index += 1
+                        logger.debug('progress: [%s/%s], time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i,frame_count, i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
                 if no_start >= 1:
                     no_start -= 1
-                if args.debug:
-                    logger.info('time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))
             else:
-                logger.warning("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
+                logger.debug("Skipped frame %d (read fail) [%s, match %s]" % (i,basename, match))
                 # break
     else:
-        logger.warning("file error (frame_count is minus)")
+        logger.error("file error (frame_count is minus)")
         sys.exit(1)
 
 if __name__ == "__main__":
@@ -851,25 +847,25 @@ if __name__ == "__main__":
     cut_time_battle_csv = base_dir + '/cut_time_battle.csv'
     flg_in_progress = base_dir + '/flg_in_progress'
 
-    logger = logging.getLogger("logger")    #logger名loggerを取得
-    logger.setLevel(logging.INFO)  #標準出力のloggerとしてはINFOで
+    # ストリームハンドラの設定
+    stream_handler = StreamHandler()
+    stream_handler.setLevel(INFO)
+    stream_handler.setFormatter(Formatter("%(message)s"))
 
-    #handler1を作成
-    handler1 = logging.StreamHandler()
-    handler1.setLevel(logging.WARN)     #handler2はLevel.WARN以上
-    handler1.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+    # ファイルハンドラの設定
+    file_handler = FileHandler(filename=base_dir+"/ocr.log")
+    file_handler.setLevel(DEBUG)
+    file_handler.setFormatter(
+        Formatter("%(asctime)s@ %(name)s [%(levelname)s] %(funcName)s: %(message)s")
+    )
 
-    #handler2を作成
-    handler2 = logging.FileHandler(filename=base_dir+"/ocr.log")  #handler2はファイル出力
-    handler2.setLevel(logging.DEBUG)     #handler2はLevel.WARN以上
-    handler2.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+    # ルートロガーの設定
+    logging.basicConfig(level=NOTSET, handlers=[stream_handler, file_handler])
 
-    #loggerに2つのハンドラを設定
-    logger.addHandler(handler1)
-    logger.addHandler(handler2)
+    logger = logging.getLogger(__name__)
 
     # init_logger.info()
-    logger.warning("main start [%s]",(basename))
+    logger.info("main start [%s]",(basename))
 
 
     ####################################

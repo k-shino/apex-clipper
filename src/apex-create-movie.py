@@ -6,6 +6,8 @@ import numpy as np
 import cv2
 from tqdm import tqdm
 import logging
+from logging import StreamHandler, FileHandler, Formatter
+from logging import INFO, DEBUG, NOTSET
 import argparse
 import shutil
 parser = argparse.ArgumentParser()
@@ -81,37 +83,36 @@ before_scene_sec = 3
 os.makedirs(battle_work_dir, exist_ok=True)
 battle_write_log_path = battle_work_dir+'/create_match_clip.log'
 
+# ストリームハンドラの設定
+stream_handler = StreamHandler()
+stream_handler.setLevel(INFO)
+stream_handler.setFormatter(Formatter("%(message)s"))
 
-logger = logging.getLogger("logger")    #logger名loggerを取得
-logger.setLevel(logging.INFO)  #標準出力のloggerとしてはINFOで
+# ファイルハンドラの設定
+file_handler = FileHandler(filename=battle_write_log_path)
+file_handler.setLevel(DEBUG)
+file_handler.setFormatter(
+    Formatter("%(asctime)s@ %(name)s [%(levelname)s] %(funcName)s: %(message)s")
+)
 
-#handler1を作成
-handler1 = logging.StreamHandler()
-handler1.setLevel(logging.WARN)     #handler2はLevel.WARN以上
-handler1.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+# ルートロガーの設定
+logging.basicConfig(level=NOTSET, handlers=[stream_handler, file_handler])
 
-#handler2を作成
-handler2 = logging.FileHandler(filename=battle_write_log_path)  #handler2はファイル出力
-handler2.setLevel(logging.DEBUG)     #handler2はLevel.WARN以上
-handler2.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
-
-#loggerに2つのハンドラを設定
-logger.addHandler(handler1)
-logger.addHandler(handler2)
+logger = logging.getLogger(__name__)
 
 # init_logger.info()
-logger.warning("apex-create-movie.py with option: %s",(args))
+logger.info("apex-create-movie.py with option: %s",(args))
 
 with open(battle_write_log_path, mode='w') as logfile:
     sss = []
     scene = []
     match = []
-    logger.debug("[DEBUG] start program")
+    logger.info("start program")
     is_csv_file = os.path.isfile(cut_time_battle_csv)
     if is_csv_file:
         if os.path.getsize(cut_time_battle_csv) != 0:
 
-            logger.warning("[DEBUG] Open csv file")
+            logger.debug("Open csv file")
 
             with open(cut_time_battle_csv) as f:
                 reader = csv.reader(f)
@@ -119,27 +120,27 @@ with open(battle_write_log_path, mode='w') as logfile:
                     sss.append(row[0])
                     scene.append(row[1])
                     match.append(row[2])
-            logger.warning("[DEBUG] Finish load csv file")
+            logger.debug("Finish load csv file")
 
 
             start = sss[0]
             end = sss[0]
             current = 0
-            logger.warning("[DEBUG] Start csv loop. len(sss) = %s",(len(sss)))
+            logger.debug("Start csv loop. len(sss) = %s",(len(sss)))
 
             # for i in range(len(sss)):
             for i in range(len(sss)):
 
-                logger.warning("[DEBUG]   loop %s of %s" % (i, len(sss)))
+                logger.debug("  loop %s of %s" % (i, len(sss)))
 
                 # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death / 8:kill / 9:champion / 10:map / 12: darkveil
                 if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 9 or int(scene[i]) == 10 or int(scene[i]) == 12:
 
-                    logger.warning("[DEBUG]     i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
+                    logger.debug("    i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
 
                     if float(current) <= float(sss[i]):
                         start=float(sss[i])
-                        logger.warning("[DEBUG]     check %s'th record, start = %s, current = %s, i = %s, sec = %s, scene = %s" % (i,start, current, i,sss[i], scene[i]))
+                        logger.debug("    check %s'th record, start = %s, current = %s, i = %s, sec = %s, scene = %s" % (i,start, current, i,sss[i], scene[i]))
 
                         ss = sss[i]
                         # start, endの更新処理
@@ -149,10 +150,10 @@ with open(battle_write_log_path, mode='w') as logfile:
                         #############
                         j=i+1
                         end_flg=True
-                        logger.warning("[DEBUG]       start j loop")
+                        logger.debug("      start j loop")
 
                         while len(sss) > j and end_flg:
-                            # logger.warning("[DEBUG]         j = %s, end_flg = %s" % (j, end_flg))
+                            logger.debug("        j = %s, end_flg = %s" % (j, end_flg))
                             # 特徴点が連続している場合
                             if int(scene[j]) == 1 or int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 5 or int(scene[j]) == 3 or int(scene[j]) == 9 or int(scene[j]) == 10 or int(scene[j]) == 12:
                                 # 特徴点が戦闘の場合
@@ -182,7 +183,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                             else:
                                 end = float(ss)
                                 end_flg=False
-                            # logger.warning("[DEBUG]           end of j loop: j = %s, end_flg = %s, end = %s" % (j, end_flg, end))
+                            logger.debug("          end of j loop: j = %s, end_flg = %s, end = %s" % (j, end_flg, end))
 
                             j+=1
 
@@ -215,22 +216,22 @@ with open(battle_write_log_path, mode='w') as logfile:
                         if int(scene[i]) == 5 or int(scene[i]) == 9:
                             duration_before = max(float(end) - float(start) + before_scene_sec, battle_final_rec)
                             duration_after = death_after_sec
-                            logger.warning("[DEBUG]         (result scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                            logger.debug("        (result scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
                         # map
                         elif int(scene[i]) == 10:
                             duration_before = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
                             duration_after = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
-                            logger.warning("[DEBUG]         (map scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                            logger.debug("        (map scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
                         # result, other
                         if int(scene[i]) == 0 or int(scene[i]) == 3:
                             duration_before = 10
                             duration_after = max(float(end) - float(start) + before_scene_sec, 10)
-                            logger.warning("[DEBUG]         (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                            logger.debug("        (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
                         else:
                             duration_before = death_after_sec
                             duration_after = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
-                            logger.warning("[DEBUG]         (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
-                        logger.warning("[DEBUG]       finish calc duration: start = %s,  end = %s, duration_before = %s, duration_after = %s" % (start, end,duration_before, duration_after))
+                            logger.debug("        (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                        logger.debug("finish calc duration: start = %s,  end = %s, duration_before = %s, duration_after = %s" % (start, end,duration_before, duration_after))
 
 
                         if (float(end) - float(before_scene_sec)) < float(current):
@@ -250,7 +251,7 @@ with open(battle_write_log_path, mode='w') as logfile:
 
                         # durationが0以上の場合にクリップ生成処理
                         if duration != 0:
-                            logger.warning("[DEBUG]       Export battle scene %d from %f sec for %f sec from %s" % (i,start,duration,src_movie))
+                            logger.info("Export battle scene %d from %f sec for %f sec from %s" % (i,start,duration,src_movie))
 
                             match_dir = battle_work_dir + '/match' + match[i] + '/rec'
                             # os.makedirs(match_dir, exist_ok=True)
@@ -258,7 +259,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                             
                             # if args.debug:
                             #     duration=5
-                            #     log = "    [DEBUG] rec duration: %f " % (duration)
+                            #     log = "    rec duration: %f " % (duration)
                             #     print(log)
                             #     logfile.write(log+'\n')
 
@@ -267,12 +268,12 @@ with open(battle_write_log_path, mode='w') as logfile:
                             else:
                                 command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:1 -map 0:a:2 -map 0:a:3 -vsync 1 -async 1000 -loglevel quiet \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
 
-                            logger.warning("[DEBUG]       ffmpeg command: %s" % (command))
+                            logger.debug("ffmpeg command: %s" % (command))
                             # subprocess.run(command, shell=True)
                             subprocess.run(command, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
                             subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
                         else:
-                            logger.warning("[DEBUG]       Skip export clip in loop: %s" % (i))
+                            logger.debug("Skip export clip in loop: %s" % (i))
 
                         if int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8:
                             start = -1
@@ -283,22 +284,19 @@ with open(battle_write_log_path, mode='w') as logfile:
                         #     end = ss
                         #     if start == -1 and not ( int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8):
                         #         start = float(ss)
-                        #log = "  [DEBUG] ss:%s start:%s end:%s scene:%s" % (ss, start, end, scene[i])
+                        #log = "  ss:%s start:%s end:%s scene:%s" % (ss, start, end, scene[i])
                         #print(log)
                         #logfile.write(log+'\n')
                     else:
-                        logger.warning("[DEBUG]     skip %s'th record, current = %s, i = %s, sec = %s, scene = %s" % (i,current, i,sss[i], scene[i]))
+                        logger.debug("    skip %s'th record, current = %s, i = %s, sec = %s, scene = %s" % (i,current, i,sss[i], scene[i]))
 
 
-            if args.debug:
-                log = "[DEBUG] Finish csv loop"
-                print(log)
-                logfile.write(log+'\n')
+            logger.debug("Finish csv loop")
 
             # # csvファイルを一通り捜査した後の録画処理
             # if not start == -1:
 
-            #     log = "[DEBUG] i = %s, scene = %s" % (i,scene[i])
+            #     log = "i = %s, scene = %s" % (i,scene[i])
             #     print(log)
             #     logfile.write(log+'\n')
 
@@ -313,7 +311,7 @@ with open(battle_write_log_path, mode='w') as logfile:
 
             #     # if args.debug:
             #     #     duration=5
-            #     #     log = "  [DEBUG] rec duration: %f " % (duration)
+            #     #     log = "  rec duration: %f " % (duration)
             #     #     print(log)
             #     #     logfile.write(log+'\n')
 
@@ -321,7 +319,7 @@ with open(battle_write_log_path, mode='w') as logfile:
             #         command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:%s -acodec copy -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, args.audio ,match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
             #     else:
             #         command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:1 -map 0:a:2 -map 0:a:3 -vsync 1 -async 1000 \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
-            #     log = "  [DEBUG] ffmpeg command: %s" % (command)
+            #     log = "  ffmpeg command: %s" % (command)
             #     print(log)
             #     logfile.write(log+'\n')
             #     subprocess.run(command, shell=True)
