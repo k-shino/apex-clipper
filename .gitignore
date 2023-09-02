@@ -147,3 +147,6 @@ dmypy.json
 *.txt
 
 test/tmp
+test/ocr/2023-08-26_16-44-31/*
+test/orig/2023-08-26_16-44-31.mp4
+test/orig/switch2.mp4
