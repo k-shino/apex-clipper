@@ -183,7 +183,8 @@ def main():
             if not args.skipimage:
                 os.makedirs(battle_dir, exist_ok=True)
                 os.makedirs(result_dir, exist_ok=True)
-                os.makedirs(debug_dir, exist_ok=True)
+                if args.debug:
+                    os.makedirs(debug_dir, exist_ok=True)
 
             logger.debug("before read")
 
