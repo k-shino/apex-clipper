@@ -2,6 +2,7 @@
 
 set -eu
 
+tmpdir=${tmpdir:-tmp}
 target=${target:-clip}
 mode=${mode:-ocr}
 audio=${audio:-1}
@@ -18,9 +19,9 @@ dummy_date="2023-08-01_10-00-00"
 
 cd ../test
 
-rm -rf tmp
-mkdir -p tmp
-cd tmp
+rm -rf ${tmpdir}
+mkdir -p ${tmpdir}
+cd ${tmpdir}
 mkdir -p orig out ocr work apex_kill_clip
 cp "../orig/${target}.mp4" orig/${dummy_date}.mp4
 

@@ -2,6 +2,8 @@
 
 set -eux
 
+export tmpdir=${tmpdir:-tmp}
+
 cd ../src
 
 docker build -f ./docker/Dockerfile-arm64 -t apex-clipper:local .
@@ -13,7 +15,7 @@ export mode=ocr
 export audio=0
 export expected_result=0
 export debug=false
-export skipimage=true
+export skipimage=false
 
 ./test-action.sh
 

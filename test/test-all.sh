@@ -2,6 +2,8 @@
 
 set -eux
 
+export tmpdir=${tmpdir:-tmp}
+
 cd ../src
 
 docker build -f ./docker/Dockerfile-arm64 -t apex-clipper:local .
