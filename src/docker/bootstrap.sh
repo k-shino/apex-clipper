@@ -373,7 +373,9 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ]; then
                         echo "      finish merge clips match $match"
                         echo "      -----------------------------------------"
 
-                        rm -rf "${match}/rec"
+                        if ! "$DEBUG_MODE"; then
+                            rm -rf "${match}/rec"
+                        fi
 
                     # done
                     done < <(find "${export_dir}" -maxdepth 1 -type d | grep match)
