@@ -428,6 +428,7 @@ def main():
                         result_cl_ult_4,this_no_start = apex_search(txt, 'enemy', '我々を守れ', i , '12',fps,writer,match,debug_dir) # カタリストULT
                         result_cl_ult_5,this_no_start = apex_search(txt, 'enemy', 'バリケードを形成', i , '12',fps,writer,match,debug_dir) # カタリストULT
                         result_cl_ult_6,this_no_start = apex_search(txt, 'enemy', 'サポートフォーメーション', i , '12',fps,writer,match,debug_dir) # カタリストULT
+                        result_memberlist,this_no_start = apex_search(txt, 'memberlist', 'チャンピョンを紹介', i , '1',fps,writer,match,debug_dir) # メンバー一覧（チャンピョン紹介）
 
                         # 戦闘状態抽出の共通処理
                         result_in_battle = result_a or result_c or result_h or result_j or result_k or result_l or result_m or result_n or result_o or result_p or result_q or result_r or result_s or result_t or result_u or result_v or result_w
@@ -648,6 +649,18 @@ def main():
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
+
+                        # チャンピョンを紹介（マッチ開始）
+                        if result_memberlist:
+                            if not args.skipimage:
+                                out_path_image = os.path.join(
+                                    battle_dir, "introduce_champion_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                                cv2.imwrite(out_path_image,img)
+                            logger.info("[%4.1f]Match starting (introducing champion) [%s, match %s]" % (i/fps,basename, match))
+                            no_start = max(int(fps * skip_in_normal), no_start)
+                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
+                            flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
                         # 降下中
                         if result_landing:
