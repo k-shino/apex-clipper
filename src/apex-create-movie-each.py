@@ -37,6 +37,8 @@ parser.add_argument("--match", type=str,
 
 args = parser.parse_args()
 
+scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL']
+
 # 切り出し元動画パス
 src_movie = args.src
 basename = os.path.splitext(os.path.basename(src_movie))[0]
@@ -129,7 +131,8 @@ with open(battle_write_log_path, mode='w') as logfile:
                     scene.append(row[1])
                     match.append(row[2])
             logger.debug("Finish load csv file")
-            start = sss[0]
+            # start = sss[0]
+            start = -1
             end = sss[0]
             current = 0
             logger.debug("Start csv loop. len(sss) = %s",(len(sss)))
@@ -139,170 +142,168 @@ with open(battle_write_log_path, mode='w') as logfile:
                 logger.debug("  loop %s of %s" % (i, len(sss)))
 
                 if int(match[i]) == match_num:
+
                     # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death / 8:kill / 9:champion
                     if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 9 or int(scene[i]) == 10 or int(scene[i]) == 12:
-                        logger.debug("    i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
+                        logger.debug("    Match target scene; i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
 
-                        if float(current) <= float(sss[i]):
-                            start=float(sss[i])
-                            logger.debug("    check %s'th record, start = %s, current = %s, i = %s, sec = %s, scene = %s" % (i,start, current, i,sss[i], scene[i]))
-
-                            ss = sss[i]
-                            # start, endの更新処理
-                            
-                            #############
-                            # endの更新
-                            #############
-                            j=i+1
-                            end_flg=True
-                            logger.debug("      start j loop")
-
-                            while len(sss) > j and end_flg:
-                                logger.debug("        j = %s, end_flg = %s" % (j, end_flg))
-                                # 特徴点が連続している場合
-                                if int(scene[j]) == 1 or int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 5 or int(scene[j]) == 3 or int(scene[j]) == 9 or int(scene[j]) == 10 or int(scene[j]) == 12:
-                                    # 特徴点が戦闘の場合
-                                    if int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 12:
-                                        # 次の特徴点までの時間がcut_duration_battle秒以上空く場合
-                                        if float(sss[j]) - float(sss[j-1]) > cut_duration_battle:
-                                            end = float(sss[i])
-                                            end_flg = False
-                                    # 特徴点がリザルト画面、部隊全滅、チャンピョンの場合
-                                    elif int(scene[i]) == 0 or int(scene[i]) == 5 or int(scene[i]) == 9:
-                                        # 次の特徴点までの時間がcut_duration_result(15)秒以上空く場合
-                                        if float(sss[j]) - float(sss[j-1]) > cut_duration_result:
-                                            end = float(sss[i])
-                                            end_flg = False
-                                    # 特徴点がマップの場合
-                                    elif int(scene[i]) == 10:
-                                        # 次の特徴点までの時間がcut_duration_map(3)秒以上空く場合
-                                        if float(sss[j]) - float(sss[j-1]) > cut_duration_map:
-                                            end = float(sss[i])
-                                            end_flg = False
-                                    # 特徴点がその他の場合
-                                    elif int(scene[i]) == 1 or int(scene[i]) == 3:
-                                        # 次の特徴点までの時間がcut_duration_normal(5)秒以上空く場合
-                                        if float(sss[j]) - float(sss[j-1]) > cut_duration_normal:
-                                            end = float(sss[i])
-                                            end_flg = False
-                                else:
-                                    end = float(ss)
-                                    end_flg=False
-                                logger.debug("          end of j loop: j = %s, end_flg = %s, end = %s" % (j, end_flg, end))
-
-                                j+=1
-
-                            # # 特徴点が戦闘の場合
-                            # if int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 12:
-                            #     j=i+1
-                            #     # csvファイルで、戦闘の特徴点が継続しているところまでを抽出
-                            #     while len(sss) > j and (int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 12):
-                            #         end = float(sss[j]) + float(cut_duration_battle)
-                            #         j+=1
-                            # # 特徴点がリザルト画面、部隊全滅、チャンピョンの場合
-                            # elif int(scene[i]) == 0 or int(scene[i]) == 5 or int(scene[i]) == 9:
-                            #     j=i+1
-                            #     # csvファイルで、戦闘の特徴点が継続しているところまでを抽出
-                            #     while len(sss) > j and (int(scene[j]) == 0 or int(scene[j]) == 5 or int(scene[j]) == 9):
-                            #         end = float(sss[j]) + float(cut_duration_result)
-                            #         j+=1
-                            # # 特徴点がマップの場合
-                            # elif int(scene[i]) == 10:
-                            #     j=i+1
-                            #     # csvファイルで、戦闘の特徴点が継続しているところまでを抽出
-                            #     while len(sss) > j and (int(scene[j]) == 10):
-                            #         end = float(sss[j]) + float(cut_duration_map)
-                            #         j+=1
-                            # else:
-                            #     end = float(end) + float(cut_duration_battle)
-
-                            # クリップの時間durationを計算し、startを調整
-                            # 全滅かチャンピョンの場合のみ、battle_final_recを利用.
-                            if int(scene[i]) == 5 or int(scene[i]) == 9:
-                                duration_before = max(float(end) - float(start) + before_scene_sec, battle_final_rec)
-                                duration_after = death_after_sec
-                                logger.debug("        (result scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
-                            # map
-                            elif int(scene[i]) == 10:
-                                duration_before = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
-                                duration_after = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
-                                logger.debug("        (map scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
-                            # result, other
-                            if int(scene[i]) == 0 or int(scene[i]) == 3:
-                                duration_before = 10
-                                duration_after = max(float(end) - float(start) + before_scene_sec, 10)
-                                logger.debug("        (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
-                            else:
-                                duration_before = death_after_sec
-                                duration_after = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
-                                logger.debug("        (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
-                            logger.debug("      finish calc duration: start = %s,  end = %s, duration_before = %s, duration_after = %s" % (start, end,duration_before, duration_after))
-
-
-                            if (float(end) - float(before_scene_sec)) < float(current):
-                                start = current
-                            else:
-                                start = float(end) - float(duration_before)
-                            duration = duration_before + duration_after
-                            end = start + duration
-                            current = float(end)
-
-                            # # endを固定し、durationからstartを計算。ただし、前後のクリップで同じ時間を抽出しないように、current以前の時間をクリップしないように調整
-                            # start = float(end) - float(duration) - before_scene_sec
-                            # if float(current) > float(start):
-                            #     duration = float(duration) - ( float(current) - float(start) )
-                            #     start = current
-                            # current = float(start) + float(duration)
-
-                            # durationが0以上の場合にクリップ生成処理
-                            if duration != 0:
-                                logger.info("      Export battle scene %d from %f sec for %f sec from %s" % (i,start,duration,src_movie))
-
-                                match_dir = battle_work_dir + '/rec'
-                                # os.makedirs(match_dir, exist_ok=True)
-                                os.makedirs(match_dir, exist_ok=True)
-                                
-                                # if args.debug:
-                                #     duration=5
-                                #     log = "    rec duration: %f " % (duration)
-                                #     print(log)
-                                #     logfile.write(log+'\n')
-
-                                if args.audio:
-                                    command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:%s -acodec copy -vsync 1 -async 1000 -loglevel quiet \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, args.audio , match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
-                                else:
-                                    command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:1 -map 0:a:2 -map 0:a:3 -vsync 1 -async 1000 -loglevel quiet \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
-
-                                logger.debug("      ffmpeg command: %s" % (command))
-                                # subprocess.run(command, shell=True)
-                                subprocess.run(command, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
-                                subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
-                            else:
-                                logger.debug("      Skip export clip in loop: %s" % (i))
-
-                            if int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8:
-                                start = -1
-                            else:
-                                start = float(ss)
-                            # end = ss
-                            # else:
-                            #     end = ss
-                            #     if start == -1 and not ( int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8):
-                            #         start = float(ss)
-                            #log = "  ss:%s start:%s end:%s scene:%s" % (ss, start, end, scene[i])
-                            #print(log)
-                            #logfile.write(log+'\n')
+                        # matchの最初(start=-1)は、scene=0をスキップする
+                        if start == -1 and int(scene[i]) == 0:
+                            logger.debug("    Skip result scene (lobby) ; i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
+                            # do nothing
                         else:
-                            logger.debug("    skip %s'th record, current = %s, i = %s, sec = %s, scene = %s" % (i,current, i,sss[i], scene[i]))
+                            # currentが先に進んでいる場合はスキップ
+                            if float(current) <= float(sss[i]):
+                                start=float(sss[i])
+                                logger.debug("    check %s'th record, start = %s, current = %s, i = %s, sec = %s, scene = %s" % (i,start, current, i,sss[i], scene[i]))
+
+                                ss = sss[i]
+                                # start, endの更新処理
+                                
+                                #############
+                                # endの更新
+                                #############
+                                j=i+1
+                                end_flg=True
+                                logger.debug("      start j loop")
+
+                                while len(sss) > j and end_flg:
+                                    logger.debug("        j = %s, end_flg = %s" % (j, end_flg))
+                                    # 特徴点が連続している場合
+                                    if int(scene[j]) == 1 or int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 5 or int(scene[j]) == 3 or int(scene[j]) == 9 or int(scene[j]) == 10 or int(scene[j]) == 12:
+                                        # 特徴点が戦闘の場合
+                                        if int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 12:
+                                            # 次の特徴点までの時間がcut_duration_battle秒以上空く場合
+                                            if float(sss[j]) - float(sss[j-1]) > cut_duration_battle:
+                                                end = float(sss[i])
+                                                end_flg = False
+                                        # 特徴点がリザルト画面、部隊全滅、チャンピョンの場合
+                                        elif int(scene[i]) == 0 or int(scene[i]) == 5 or int(scene[i]) == 9:
+                                            # 次の特徴点までの時間がcut_duration_result(15)秒以上空く場合
+                                            if float(sss[j]) - float(sss[j-1]) > cut_duration_result:
+                                                end = float(sss[i])
+                                                end_flg = False
+                                        # 特徴点がマップの場合
+                                        elif int(scene[i]) == 10:
+                                            # 次の特徴点までの時間がcut_duration_map(3)秒以上空く場合
+                                            if float(sss[j]) - float(sss[j-1]) > cut_duration_map:
+                                                end = float(sss[i])
+                                                end_flg = False
+                                        # 特徴点がその他の場合
+                                        elif int(scene[i]) == 1 or int(scene[i]) == 3:
+                                            # 次の特徴点までの時間がcut_duration_normal(5)秒以上空く場合
+                                            if float(sss[j]) - float(sss[j-1]) > cut_duration_normal:
+                                                end = float(sss[i])
+                                                end_flg = False
+                                    else:
+                                        end = float(ss)
+                                        end_flg=False
+                                    logger.debug("          end of j loop: j = %s, end_flg = %s, end = %s" % (j, end_flg, end))
+
+                                    j+=1
+
+                                # # 特徴点が戦闘の場合
+                                # if int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 12:
+                                #     j=i+1
+                                #     # csvファイルで、戦闘の特徴点が継続しているところまでを抽出
+                                #     while len(sss) > j and (int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 12):
+                                #         end = float(sss[j]) + float(cut_duration_battle)
+                                #         j+=1
+                                # # 特徴点がリザルト画面、部隊全滅、チャンピョンの場合
+                                # elif int(scene[i]) == 0 or int(scene[i]) == 5 or int(scene[i]) == 9:
+                                #     j=i+1
+                                #     # csvファイルで、戦闘の特徴点が継続しているところまでを抽出
+                                #     while len(sss) > j and (int(scene[j]) == 0 or int(scene[j]) == 5 or int(scene[j]) == 9):
+                                #         end = float(sss[j]) + float(cut_duration_result)
+                                #         j+=1
+                                # # 特徴点がマップの場合
+                                # elif int(scene[i]) == 10:
+                                #     j=i+1
+                                #     # csvファイルで、戦闘の特徴点が継続しているところまでを抽出
+                                #     while len(sss) > j and (int(scene[j]) == 10):
+                                #         end = float(sss[j]) + float(cut_duration_map)
+                                #         j+=1
+                                # else:
+                                #     end = float(end) + float(cut_duration_battle)
+
+                                # クリップの時間durationを計算し、startを調整
+                                # 全滅かチャンピョンの場合のみ、battle_final_recを利用.
+                                if int(scene[i]) == 5 or int(scene[i]) == 9:
+                                    duration_before = max(float(end) - float(start) + before_scene_sec, battle_final_rec)
+                                    duration_after = death_after_sec
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                # map
+                                elif int(scene[i]) == 10:
+                                    duration_before = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
+                                    duration_after = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                # result, other
+                                if int(scene[i]) == 0 or int(scene[i]) == 3:
+                                    duration_before = 10
+                                    duration_after = max(float(end) - float(start) + before_scene_sec, 10)
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                else:
+                                    duration_before = death_after_sec
+                                    duration_after = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                logger.debug("      finish calc duration: start = %s,  end = %s, duration_before = %s, duration_after = %s" % (start, end,duration_before, duration_after))
 
 
-                if args.debug:
-                    log = "Finish csv loop"
-                    print(log)
-                    logfile.write(log+'\n')
+                                if (float(end) - float(before_scene_sec)) < float(current):
+                                    start = current
+                                else:
+                                    start = float(end) - float(duration_before)
+                                duration = duration_before + duration_after
+                                end = start + duration
+                                current = float(end)
 
+                                # # endを固定し、durationからstartを計算。ただし、前後のクリップで同じ時間を抽出しないように、current以前の時間をクリップしないように調整
+                                # start = float(end) - float(duration) - before_scene_sec
+                                # if float(current) > float(start):
+                                #     duration = float(duration) - ( float(current) - float(start) )
+                                #     start = current
+                                # current = float(start) + float(duration)
 
+                                # durationが0以上の場合にクリップ生成処理
+                                if duration != 0:
+                                    logger.info("      Export battle scene %d from %f sec for %f sec from %s" % (i,start,duration,src_movie))
 
+                                    match_dir = battle_work_dir + '/rec'
+                                    # os.makedirs(match_dir, exist_ok=True)
+                                    os.makedirs(match_dir, exist_ok=True)
+                                    
+                                    # if args.debug:
+                                    #     duration=5
+                                    #     log = "    rec duration: %f " % (duration)
+                                    #     print(log)
+                                    #     logfile.write(log+'\n')
+
+                                    if args.audio:
+                                        command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:%s -acodec copy -vsync 1 -async 1000 -loglevel quiet \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, args.audio , match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
+                                    else:
+                                        command = "ffmpeg -y -ss %s -i \"%s\" -t %d -map 0:v:0 -vcodec libx264 -map 0:a:1 -map 0:a:2 -map 0:a:3 -vsync 1 -async 1000 -loglevel quiet \"%s/%s_battle%03d_%03dm%02ds-%03dm%02ds.mp4\" </dev/null 2>&1 </dev/null 2>&1" % (start, src_movie, duration, match_dir, basename, i, int(float(start)) // 60, int(int(float(start)) % 60) ,int(float(start)+float(duration)) // 60, int(float(start)+float(duration)) % 60)
+
+                                    logger.debug("      ffmpeg command: %s" % (command))
+                                    # subprocess.run(command, shell=True)
+                                    subprocess.run(command, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
+                                    subprocess.run('ls -al '+match_dir, shell=True,stdout = subprocess.DEVNULL,stderr = subprocess.DEVNULL)
+                                else:
+                                    logger.debug("      Skip export clip in loop: %s" % (i))
+
+                                if int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8:
+                                    start = -1
+                                else:
+                                    start = float(ss)
+                                # end = ss
+                                # else:
+                                #     end = ss
+                                #     if start == -1 and not ( int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 9 or int(scene[i]) == 8):
+                                #         start = float(ss)
+                                #log = "  ss:%s start:%s end:%s scene:%s" % (ss, start, end, scene[i])
+                                #print(log)
+                                #logfile.write(log+'\n')
+                            else:
+                                logger.debug("    Skip %s'th record (current is ahead of start), current = %s, i = %s, sec = %s, scene = %s" % (i,current, i,sss[i], scene[i]))
 
 
             # # csvファイルを一通り捜査した後の録画処理
