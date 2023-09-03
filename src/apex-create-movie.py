@@ -39,6 +39,8 @@ args = parser.parse_args()
 src_movie = args.src
 basename = os.path.splitext(os.path.basename(src_movie))[0]
 
+scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL']
+
 # ファイル出力先のパスを指定
 export_path = args.output
 ocr_path = args.ocr
@@ -216,21 +218,21 @@ with open(battle_write_log_path, mode='w') as logfile:
                         if int(scene[i]) == 5 or int(scene[i]) == 9:
                             duration_before = max(float(end) - float(start) + before_scene_sec, battle_final_rec)
                             duration_after = death_after_sec
-                            logger.debug("        (result scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                            logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
                         # map
                         elif int(scene[i]) == 10:
                             duration_before = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
                             duration_after = max(float(end) - float(start) + before_scene_sec, float(cut_duration_map)/2.0)
-                            logger.debug("        (map scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                            logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
                         # result, other
                         if int(scene[i]) == 0 or int(scene[i]) == 3:
                             duration_before = 10
                             duration_after = max(float(end) - float(start) + before_scene_sec, 10)
-                            logger.debug("        (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                            logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
                         else:
                             duration_before = death_after_sec
                             duration_after = max(float(end) - float(start) + before_scene_sec, battle_min_rec)
-                            logger.debug("        (other scene) duration_before = %s, duration_after = %s" % (duration_before,duration_after))
+                            logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
                         logger.debug("finish calc duration: start = %s,  end = %s, duration_before = %s, duration_after = %s" % (start, end,duration_before, duration_after))
 
 
