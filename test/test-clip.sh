@@ -25,7 +25,15 @@ cd ../test
 # ./test-action.sh
 
 
-export target=2023-08-26_16-44-31
+# export target=2023-08-26_16-44-31
+# export mode=match_clip
+# export audio=0
+# export expected_result=2
+# export debug=true
+
+# ./test-action.sh
+
+export target=2023-09-01_23-20-09
 export mode=match_clip
 export audio=0
 export expected_result=2

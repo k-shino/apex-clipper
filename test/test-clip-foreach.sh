@@ -38,10 +38,19 @@ cd ../test
 
 # ./test-action.sh
 
-export target=2023-08-26_16-44-31
+# export target=2023-08-26_16-44-31
+# export mode=match_clip_foreach
+# export audio=1
+# export expected_result=2
+# export debug=false
+
+# ./test-action.sh
+
+
+export target=2023-09-02_20-33-17
 export mode=match_clip_foreach
-export audio=1
-export expected_result=2
-export debug=false
+export audio=0
+export expected_result=3
+export debug=true
 
 ./test-action.sh
