@@ -418,9 +418,9 @@ def main():
                         result_lf_2,this_no_start = apex_search(txt, 'enemy', '攻撃中', i , '4',fps,writer,match,debug_dir) # 攻撃(ライフライン)
                         result_pf_2,this_no_start = apex_search(txt, 'enemy', '割った', i , '4',fps,writer,match,debug_dir) # 敵発見(パスファインダー)
                         result_cl_1,this_no_start = apex_search(txt, 'enemy', 'フラグを', i , '4',fps,writer,match,debug_dir) # 攻撃(カタリスト)
-                        result_cl_2,this_no_start = apex_search(txt, 'enemy', 'シールドを回', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
+                        # result_cl_2,this_no_start = apex_search(txt, 'enemy', 'シールドを回', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
                         result_cl_3,this_no_start = apex_search(txt, 'enemy', '敵がい', i , '4',fps,writer,match,debug_dir) # 敵発見(カタリスト)
-                        result_cl_4,this_no_start = apex_search(txt, 'enemy', 'シールドをリ', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
+                        # result_cl_4,this_no_start = apex_search(txt, 'enemy', 'シールドをリ', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
                         result_cl_5,this_no_start = apex_search(txt, 'enemy', 'シールドを砕', i , '4',fps,writer,match,debug_dir) # シールド破壊（カタリスト）
                         result_cl_ult_1,this_no_start = apex_search(txt, 'enemy', '鉄よ', i , '12',fps,writer,match,debug_dir) # カタリストULT
                         result_cl_ult_2,this_no_start = apex_search(txt, 'enemy', 'アタシに従え', i , '12',fps,writer,match,debug_dir) # カタリストULT
@@ -595,7 +595,7 @@ def main():
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
                         # 攻撃中
-                        if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we or result_wf or result_wj or result_wk or result_wl or result_wp or result_wq or result_lf_2 or result_cl_1 or result_cl_2:
+                        if result_o or result_p or result_q or result_r or result_u or result_v or result_va or result_vb or result_vc or result_we or result_wf or result_wj or result_wk or result_wl or result_wp or result_wq or result_lf_2 or result_cl_1:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                             if not args.skipimage:
                                 out_path_image = os.path.join(
@@ -621,19 +621,19 @@ def main():
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
-                        # 回復
-                        if result_cl_2 or result_cl_4:
-                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
-                            if not args.skipimage:
-                                out_path_image = os.path.join(
-                                    battle_dir, "shield_rechaging_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
-                                cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Rechaging shield [%s, match %s]" % (i/fps,basename, match))
-                            no_start = max(int(fps * skip_after_scan), no_start)
-                            last_time_battle = i
-                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
-                            flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
-                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+                        # # 回復
+                        # if result_cl_2 or result_cl_4:
+                        #     flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
+                        #     if not args.skipimage:
+                        #         out_path_image = os.path.join(
+                        #             battle_dir, "shield_rechaging_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                        #         cv2.imwrite(out_path_image,img)
+                        #     logger.info("[%4.1f]Rechaging shield [%s, match %s]" % (i/fps,basename, match))
+                        #     no_start = max(int(fps * skip_after_scan), no_start)
+                        #     last_time_battle = i
+                        #     flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
+                        #     flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+                        #     flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
 
                         # 敵シールド破壊
                         if result_pf_2 or result_cl_5:
