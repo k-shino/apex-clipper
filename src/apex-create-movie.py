@@ -39,7 +39,7 @@ args = parser.parse_args()
 src_movie = args.src
 basename = os.path.splitext(os.path.basename(src_movie))[0]
 
-scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL']
+scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL','landing']
 
 # ファイル出力先のパスを指定
 export_path = args.output

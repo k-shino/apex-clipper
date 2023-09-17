@@ -113,7 +113,7 @@ def apex_search(txt, type, search_text, cnt, status_dict, fps,writer,match,battl
             # シーン判定をしばらく止める
             ret_no_start = int(fps * skip_after_scan)
             ret_result = True
-            logger.debug("[%4.1f]  in apex search: find text %s (status: %s) [%s, match %s]" % (cnt/fps, search_text, status_dict, basename, match))
+            logger.debug("[time: %4.1f]   in apex search: find text %s (status: %s) [%s, match %s]" % (cnt/fps, search_text, status_dict, basename, match))
     return ret_result, ret_no_start
 
 def main():
@@ -135,7 +135,7 @@ def main():
         logger.debug("fps: %s" % fps)
         # 1秒に4回予測する.debug時は1秒に1回
         if not args.debug:
-            skip = int(fps/4)
+            skip = int(fps/2)
         else:
             skip = int(fps*2)
         # フレーム
@@ -161,7 +161,7 @@ def main():
 
         last_time_battle = 0
 
-        flg_in_lobby = False
+        flg_in_lobby = True
         flg_in_battle = False
         flg_in_result = False
 
@@ -231,7 +231,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "enemy_found_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Found enemy [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Found enemy [%s, match %s]" % (i/fps,basename, match))
                         # 敵のシールドが割れた
                         if result_d or result_e or result_f:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -239,7 +239,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Break enemy shield [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Break enemy shield [%s, match %s]" % (i/fps,basename, match))
                         # 敵が近くに着地
                         if result_g or result_h or result_i:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -248,7 +248,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "enemy_landing_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Enemy landed at near spot [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Enemy landed at near spot [%s, match %s]" % (i/fps,basename, match))
                         # リザルト画面
                         if result_c:
                             if not args.skipimage:
@@ -256,7 +256,7 @@ def main():
                                     result_dir, "result_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
                             # flg_in_lobbyがFalse -> True遷移する際にmatchをインクリメント
-                            logger.info("[%4.1f]Show result [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Show result [%s, match %s]" % (i/fps,basename, match))
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,True)
@@ -270,7 +270,7 @@ def main():
                                     out_path_image = os.path.join(
                                         battle_dir, "kd_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                     cv2.imwrite(out_path_image,img)
-                                logger.info("[%4.1f]Knock down [%s, match %s]" % (i/fps,basename, match))
+                                logger.info("[time: %4.1f] Knock down [%s, match %s]" % (i/fps,basename, match))
                                 flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                                 flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                                 flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
@@ -287,15 +287,15 @@ def main():
                         result_c,this_no_start = apex_search(txt, 'champion', 'チャンピオン', i , '9',fps,writer,match,debug_dir)
                         result_d,this_no_start = apex_search(txt, 'lobby', '戦績を表示', i , '7',fps,writer,match,debug_dir)
                         result_e,this_no_start = apex_search(txt, 'forgeshadow', 'フォージシャドウ', i , '4',fps,writer,match,debug_dir)
-                        result_f,this_no_start = apex_search(txt, 'other', 'ドロップシップ', i , '3',fps,writer,match,debug_dir)
-                        result_g,this_no_start = apex_search(txt, 'other', 'のプレイヤ', i , '3',fps,writer,match,debug_dir)
+                        result_f,this_no_start = apex_search(txt, 'landing', 'ドロップシップ', i , '13',fps,writer,match,debug_dir)
+                        result_g,this_no_start = apex_search(txt, 'landing', 'のプレイヤ', i , '13',fps,writer,match,debug_dir)
                         if result_a:
                             if not args.skipimage:
                                 out_path_image = os.path.join(
                                     battle_dir, "death_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
-                            logger.info("[%4.1f]Eliminated squad [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Eliminated squad [%s, match %s]" % (i/fps,basename, match))
                         if result_b or result_c:
                             if not args.skipimage:
                                 out_path_image = os.path.join(
@@ -318,7 +318,7 @@ def main():
                                     battle_dir, "revenant_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
-                            logger.info("[%4.1f]Use Forge Shadow [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Use Forge Shadow [%s, match %s]" % (i/fps,basename, match))
 
                         # 降下中
                         if result_f or result_g:
@@ -326,7 +326,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "landing_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Landing [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Landing [%s, match %s]" % (i/fps,basename, match))
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
 
@@ -347,7 +347,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "kill_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Kill enemy [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Kill enemy [%s, match %s]" % (i/fps,basename, match))
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                         # ノックダウン
                         if result_c or result_d or result_e:
@@ -355,7 +355,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "knock_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Knock down enemy [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Knock down enemy [%s, match %s]" % (i/fps,basename, match))
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
 
                         ####################################                    
@@ -445,7 +445,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "kd_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Knock down [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Knock down [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -462,14 +462,14 @@ def main():
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
-                            logger.info("[%4.1f]Knock down enemy [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Knock down enemy [%s, match %s]" % (i/fps,basename, match))
                         # ダウン状態（金ノックダウンシールド有）
                         if result_c:
                             if not args.skipimage:
                                 out_path_image = os.path.join(
                                     battle_dir, "down_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Down player [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Down player [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -481,7 +481,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "landing_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Landing [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Landing [%s, match %s]" % (i/fps,basename, match))
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                         # Apex Champion
@@ -500,7 +500,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "blackhole_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Use Blackhole [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Use Blackhole [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -512,7 +512,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "fuse_ability_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Use Knuckle Cluster [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Use Knuckle Cluster [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -524,7 +524,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "seer_ability_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Use Focus of attention [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Use Focus of attention [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -536,7 +536,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "seer_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Use Showcase [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Use Showcase [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -548,7 +548,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "revenant_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Use Forge Shadow [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Use Forge Shadow [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -561,7 +561,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "catalyst_ult_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Use Dark Evil [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Use Dark Evil [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -575,7 +575,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "enemy_member_damaged_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Attacked by enemy [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Attacked by enemy [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -588,7 +588,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "party_member_down_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Member down [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Member down [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -601,7 +601,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "enemy_attack_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Attacking enemy [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Attacking enemy [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -614,7 +614,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "enemy_found_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Found enemy [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Found enemy [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -628,7 +628,7 @@ def main():
                         #         out_path_image = os.path.join(
                         #             battle_dir, "shield_rechaging_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                         #         cv2.imwrite(out_path_image,img)
-                        #     logger.info("[%4.1f]Rechaging shield [%s, match %s]" % (i/fps,basename, match))
+                        #     logger.info("[time: %4.1f] Rechaging shield [%s, match %s]" % (i/fps,basename, match))
                         #     no_start = max(int(fps * skip_after_scan), no_start)
                         #     last_time_battle = i
                         #     flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -642,7 +642,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "break_enemy_shield_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Break enemy shield [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Break enemy shield [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_after_scan), no_start)
                             last_time_battle = i
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
@@ -656,7 +656,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "introduce_champion_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Match starting (introducing champion) [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Match starting (introducing champion) [%s, match %s]" % (i/fps,basename, match))
                             no_start = max(int(fps * skip_in_normal), no_start)
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
@@ -668,7 +668,7 @@ def main():
                                 out_path_image = os.path.join(
                                     battle_dir, "landing_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
                                 cv2.imwrite(out_path_image,img)
-                            logger.info("[%4.1f]Landing [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Landing [%s, match %s]" % (i/fps,basename, match))
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
 
@@ -696,7 +696,7 @@ def main():
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
                             flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,True)
                             last_time_battle = 0
-                            logger.info("[%4.1f]Show result [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Show result [%s, match %s]" % (i/fps,basename, match))
 
                         # ロビー画面に戻る
                         if result_lobby1 or result_lobby2:
@@ -718,7 +718,7 @@ def main():
 
                         # マップ画面
                         if result_map:
-                            logger.info("[%4.1f]Open map [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Open map [%s, match %s]" % (i/fps,basename, match))
                             if not args.skipimage:
                                 out_path_image = os.path.join(
                                     result_dir, "map_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -728,7 +728,7 @@ def main():
 
                         # 観戦中
                         if result_spectate:
-                            logger.info("[%4.1f]Spectate [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Spectate [%s, match %s]" % (i/fps,basename, match))
                             if not args.skipimage:
                                 out_path_image = os.path.join(
                                     result_dir, "spectate_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -752,13 +752,13 @@ def main():
                         if flg_in_battle and ( i - last_time_battle ) >= battle_duration * fps:
                             flg_in_battle = False
                             last_time_battle = 0
-                            logger.info("[%4.1f]Finish battle [%s, match %s]" % (i/fps,basename, match))
+                            logger.info("[time: %4.1f] Finish battle [%s, match %s]" % (i/fps,basename, match))
                         if args.debug:
                             no_start = 0
 
                         # ロビー　→　マッチ開始の処理
                         if not flg_in_lobby and flg_change_lobby:
-                            logger.warning("[%4.1f][EndLoop]Start new match [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                            logger.warning("[time: %4.1f] [EndLoop]Start new match [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
                             # flg_in_progress_matchファイルを削除
                             if os.path.exists(flg_in_progress_match):
@@ -785,10 +785,10 @@ def main():
                             #     f.write(str(i))
                         # 戦闘終了
                         if not flg_in_battle and flg_change_battle:
-                            logger.info("[%4.1f][EndLoop]Finish battle [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                            logger.info("[time: %4.1f] [EndLoop]Finish battle [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
                         # リザルト
                         if flg_in_result:
-                            logger.info("[%4.1f][EndLoop]Result window [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                            logger.info("[time: %4.1f] [EndLoop]Result window [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
                             if not args.skipimage:
                                 out_path_image = os.path.join(
                                     result_dir, "result_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
@@ -796,7 +796,7 @@ def main():
 
                         # リザルト→ロビー
                         if not flg_in_result and flg_change_result:
-                            logger.info("[%4.1f][EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
+                            logger.info("[time: %4.1f] [EndLoop]Finish showing result [nos=%d] [%s, match %s]" % (i/fps, no_start,basename, match))
 
                         save_index += 1
                         logger.debug('progress: [%s/%s], time:%4.1f, no_start:%d, FLG_lobby:%s, FLG_battle:%s (last: %4.1f), FPS:%.1f [%s, match %s]' % (i,frame_count, i/fps, no_start, flg_in_lobby, flg_in_battle, (last_time_battle * fps), fps, basename, match))

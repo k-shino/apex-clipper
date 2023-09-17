@@ -37,7 +37,7 @@ parser.add_argument("--match", type=str,
 
 args = parser.parse_args()
 
-scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL']
+scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL','landing']
 
 # 切り出し元動画パス
 src_movie = args.src
@@ -90,6 +90,7 @@ cut_time_battle_csv = ocr_path + '/' + basename+ '/' + 'cut_time_battle.csv'
 # 切り出し秒数
 cut_duration_normal = 10
 cut_duration_battle = 30
+cut_duration_landing = 60
 # マップ表示の抽出時間
 cut_duration_map= 6
 # リザルト、チャンピョン時の抽出時間
@@ -144,7 +145,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                 if int(match[i]) == match_num:
 
                     # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death / 8:kill / 9:champion
-                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 9 or int(scene[i]) == 10 or int(scene[i]) == 12:
+                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 9 or int(scene[i]) == 10 or int(scene[i]) == 12 or int(scene[i]) == 13:
                         logger.debug("    Match target scene; i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
 
                         # matchの最初(start=-1)は、scene=0をスキップする
@@ -165,6 +166,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                                 #############
                                 j=i+1
                                 end_flg=True
+                                this_scene_list=[int(scene[i])]
                                 current_time=sss[j]
                                 before_time=sss[i]
                                 is_keep_this_loop=False
@@ -177,7 +179,7 @@ with open(battle_write_log_path, mode='w') as logfile:
 
                                     # 特徴点が連続している場合
                                     if int(scene[j]) == 1 or int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 5 or int(scene[j]) == 3 or int(scene[j]) == 9 or int(scene[j]) == 10 or int(scene[j]) == 12:
-
+                                        this_scene_list.append(int(scene[j]))
                                         # 特徴点が戦闘の場合
                                         if int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 12:
                                             # 次の特徴点までの時間がcut_duration_battle秒以上空く場合
@@ -205,6 +207,15 @@ with open(battle_write_log_path, mode='w') as logfile:
                                                 logger.debug("            set end_flg to False, [float(sss[j]) - float(before_time) > cut_duration_map => %s - %s > %s ] j = %s, end_flg = %s, end = %s, sss[j] = %s, current_time = %s, is_keep_this_loop = %s" % (sss[j],before_time, cut_duration_map, j, end_flg, end, sss[j], current_time, is_keep_this_loop))
                                             else:
                                                 logger.debug("            keep end_flg as True, [float(sss[j]) - float(before_time) > cut_duration_map => %s - %s > %s ] j = %s, end_flg = %s, end = %s, sss[j] = %s, current_time = %s, is_keep_this_loop = %s" % (sss[j],before_time, cut_duration_map, j, end_flg, end, sss[j], current_time, is_keep_this_loop))
+                                        # 特徴点が降下中の場合
+                                        elif int(scene[j]) == 13:
+                                            # 次の特徴点までの時間がcut_duration_battle秒以上空く場合
+                                            if float(sss[j]) - float(before_time) > float(cut_duration_landing):
+                                                end = float(before_time)
+                                                end_flg = False
+                                                logger.debug("            set end_flg to False, [float(sss[j]) - float(before_time) > cut_duration_battle => %s - %s > %s ] j = %s, end_flg = %s, end = %s, sss[j] = %s, current_time = %s, is_keep_this_loop = %s" % (sss[j],before_time, cut_duration_battle, j, end_flg, end, sss[j], current_time, is_keep_this_loop))
+                                            else:
+                                                logger.debug("            keep end_flg as True, [float(sss[j]) - float(before_time) > cut_duration_battle => %s - %s > %s ] j = %s, end_flg = %s, end = %s, sss[j] = %s, current_time = %s, is_keep_this_loop = %s" % (sss[j],before_time, cut_duration_battle, j, end_flg, end, sss[j], current_time, is_keep_this_loop))                                               
                                         # 特徴点がその他の場合
                                         elif int(scene[j]) == 1 or int(scene[j]) == 3:
                                             # 次の特徴点までの時間がcut_duration_normal(5)秒以上空く場合
@@ -255,25 +266,38 @@ with open(battle_write_log_path, mode='w') as logfile:
                                 #     end = float(end) + float(cut_duration_battle)
 
                                 # クリップの時間durationを計算し、startを調整
+                                # this_scene_listに入っているscene番号でduration_before,duration_afterを決定
+
+                                # 頻度の低いイベントから判定していく
                                 # 全滅かチャンピョンの場合のみ、battle_final_recを利用.
-                                if int(scene[i]) == 5 or int(scene[i]) == 9:
+                                if 5 in this_scene_list or 9 in this_scene_list or 0 in this_scene_list:
                                     duration_before = battle_final_rec
                                     duration_after = death_after_sec
                                     logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
-                                # map
-                                elif int(scene[i]) == 10:
-                                    duration_before = (float(cut_duration_map))/2.0
-                                    duration_after = (float(cut_duration_map))/2.0
+                                # landing
+                                elif 13 in this_scene_list:
+                                    duration_before = float(cut_duration_landing)
+                                    duration_after = float(cut_duration_landing)
                                     logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
-                                # result, other
-                                elif int(scene[i]) == 0 or int(scene[i]) == 3:
-                                    duration_before = 3
-                                    duration_after = 10
-                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
-                                else:
+                                # battle
+                                elif 4 in this_scene_list:
                                     duration_before = 3
                                     duration_after = battle_min_rec
                                     logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                # other
+                                elif 3 in this_scene_list:
+                                    duration_before = 3
+                                    duration_after = 10
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                elif 10 in this_scene_list:
+                                    duration_before = (float(cut_duration_map))/2.0
+                                    duration_after = (float(cut_duration_map))/2.0
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                else:
+                                    duration_before = 3
+                                    duration_after = 10
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
+                                
                                 logger.debug("      Finish calc duration: start = %s,  end = %s, duration_before = %s, duration_after = %s" % (start, end,duration_before, duration_after))
                                 logger.debug("      Start calc start/end/duration")
 
