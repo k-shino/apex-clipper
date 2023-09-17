@@ -19,7 +19,7 @@ env:
   context: 'src'
   dockerfile_arm64: 'src/docker/Dockerfile-arm64'
   dockerfile_amd64: 'src/docker/Dockerfile-amd64'
-  version: '3.23'
+  version: '3.24'
 
 jobs:
   build-amd64:
