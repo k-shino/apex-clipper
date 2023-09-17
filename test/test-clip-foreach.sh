@@ -47,9 +47,9 @@ cd ../test
 # ./test-action.sh
 
 
-export target=2023-09-02_20-33-17
+export target=2023-09-15_23-54-03
 export mode=match_clip_foreach
-export audio=0
+export audio=2
 export expected_result=3
 export debug=true
 
