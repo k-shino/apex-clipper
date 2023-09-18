@@ -448,10 +448,10 @@ if [ "$MODE" == 'match_clip_foreach' ]; then
         # if [ ! -f $check_csv_battle ]; then
         #     python /root/apex-ocr.py $file -o $OUT_PATH 
         # fi
-        for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
-        do
-            rm -rf "${match}"/rec
-        done
+        # for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
+        # do
+        #     rm -rf "${match}"/rec
+        # done
 
         for match in $(find "${OCR_PATH}/${filename}" -maxdepth 1 -type d | grep match)
         do
@@ -539,6 +539,7 @@ if [ "$MODE" == 'match_clip_foreach' ]; then
                         echo "      -----------------------------------------"
                     # done
                     done < <(find "${export_dir}" -maxdepth 1 -type d | grep match)
+                    rm -rf "${match}"/rec
                     # for match in `find ${export_dir} -maxdepth 1 -type d | grep match`
                     # do
                     #     rm -rf ${match}/rec
