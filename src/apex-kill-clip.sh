@@ -388,6 +388,11 @@ while read row; do
 
         this_basefilename=$(basename "$last_src_file" | awk -F[.] '{print $1}')_${this_start_time}_${rec}
 
+        for file in $(find ${export_csv_local_dir} -name "*${this_basefilename}.mp4");
+        do
+            rm -f "$file"
+        done
+
         # type=knockが最終抽出点の場合，録画時間を10秒延長する
         if [ "$last_type" = "knock" ]; then
             # this_duration=$((this_duration+10))
