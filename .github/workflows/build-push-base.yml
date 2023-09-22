@@ -1,0 +1,97 @@
+name: build container
+
+on:
+  push:
+    paths:
+      - .github/workflows/build-push-base.yml
+      - src/docker/Dockerfile-base-amd64
+      - src/docker/Dockerfile-base-arm64
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  dh_user: 'kshino'
+  image: 'apex-clipper-base'
+  tag_basename_arm64: 'm1'
+  tag_basename_amd64: 'amd64'
+  context: 'src'
+  dockerfile_arm64: 'src/docker/Dockerfile-base-arm64'
+  dockerfile_amd64: 'src/docker/Dockerfile-base-amd64'
+  version: '3.28'
+
+jobs:
+  build-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: customize version
+        run: |
+          set -x
+          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/docker/Dockerfile-amd64
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push amd64 in develop branch
+        if: github.ref != 'refs/heads/main'
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}
+          platforms: linux/amd64
+          context: ${{env.context}}
+          file: ${{env.dockerfile_amd64}}
+      - name: Build and push amd64 in main branch
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename_amd64}}-${{github.sha}}
+          platforms: linux/amd64
+          context: ${{env.context}}
+          file: ${{env.dockerfile_amd64}}
+
+  build-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: customize version
+        run: |
+          set -x
+          sed -i -e 's#<version>#${{env.version}}-${{github.sha}}#' ./src/docker/Dockerfile-arm64
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push arm64 in develop branch
+        if: github.ref != 'refs/heads/main'
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}
+          platforms: linux/arm64
+          context: ${{env.context}}
+          file: ${{env.dockerfile_arm64}}
+      - name: Build and push arm64 in main branch
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}},${{env.dh_user}}/${{env.image}}:${{env.tag_basename_arm64}}-${{github.sha}}
+          platforms: linux/arm64
+          context: ${{env.context}}
+          file: ${{env.dockerfile_arm64}}
