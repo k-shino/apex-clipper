@@ -1,4 +1,4 @@
-name: build container
+name: build container base image
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - src/docker/Dockerfile-base-arm64
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-base-${{ github.ref }}
   cancel-in-progress: true
 
 env:
