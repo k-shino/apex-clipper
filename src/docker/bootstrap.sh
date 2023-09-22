@@ -407,7 +407,7 @@ if [ "$MODE" == 'match_clip_foreach' ]; then
     echo "---------------------------------------------------"
     echo "Create match-clip phase(foreach option)"
     echo "---------------------------------------------------"
-    list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name "*.mp4" -o -name "*.mkv" | sort -r)
+    list=$(find "$SRC_MOVIE_PATH/$MOVIE_DIR" -name "*.mp4" -o -name "*.mkv" | sort -R)
     if "$REVERT"; then
         list=$(echo "$list" | sort -r)
     else
@@ -453,7 +453,7 @@ if [ "$MODE" == 'match_clip_foreach' ]; then
         #     rm -rf "${match}"/rec
         # done
 
-        for match in $(find "${OCR_PATH}/${filename}" -maxdepth 1 -type d | grep match)
+        for match in $(find "${OCR_PATH}/${filename}" -maxdepth 1 -type d | grep match | sort -R)
         do
             match_in_progress=${match}/flg_create_clip_in_progress
             match_finished=${match}/flg_create_clip_finished
