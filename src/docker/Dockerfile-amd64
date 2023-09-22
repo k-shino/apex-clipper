@@ -1,48 +1,6 @@
-FROM python:3.8-slim
-
-RUN pwd
-
-RUN apt-get update && apt-get install -y \
-      wget \
-      xz-utils \
-      unzip
-
-RUN wget -O /jpn.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/jpn.traineddata
-
-
-RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
-     && tar Jxvf ./ffmpeg-release-amd64-static.tar.xz
-
-# RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-arm64-static.tar.xz \
-#      && tar Jxvf ./ffmpeg-release-arm64-static.tar.xz
-
-FROM python:3.8-slim
-
-RUN pip install --upgrade pip
-COPY requirements.txt /root/
-RUN pip install --upgrade pip
-RUN pip install -r /root/requirements.txt \
-      && rm -rf /root/.cache/pip
-
-RUN apt-get update && apt-get install -y \
-      libgl1-mesa-dev \
-      tesseract-ocr \
-      libtesseract-dev \
-      bc
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-COPY --from=0 /jpn.traineddata /usr/share/tesseract-ocr/5/tessdata/jpn.traineddata
-COPY --from=0 /ffmpeg-6.0-amd64-static/qt-faststart /usr/local/bin/
-COPY --from=0 /ffmpeg-6.0-amd64-static/ffmpeg /usr/local/bin/
-
-# COPY --from=0 /ffmpeg-6.0-arm64-static/qt-faststart /usr/local/bin/
-# COPY --from=0 /ffmpeg-6.0-arm64-static/ffmpeg /usr/local/bin/
+FROM kshino/apex-clipper-base:amd64
 
 WORKDIR /tmp
-
-# RUN wget -O /tmp/ffmpeg.zip https://www.osxexperts.net/ffmpeg6arm.zip
-# RUN wget -O /tmp/ffmpeg.zip https://www.osxexperts.net/ffmpeg6intel.zip 
-# RUN unzip /tmp/ffmpeg.zip -d /bin/
 
 ADD ./model/ /root/model/
 ADD ./apex-tracker.py /root/
