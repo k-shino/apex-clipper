@@ -369,7 +369,7 @@ def main():
                         result_d,this_no_start = apex_search(txt, 'other', 'ホールド', i , '3',fps,writer,match,debug_dir)
                         result_e,this_no_start = apex_search(txt, 'other', '同行', i , '3',fps,writer,match,debug_dir)
                         result_f,this_no_start = apex_search(txt, 'other', 'ジャンプ', i , '3',fps,writer,match,debug_dir)
-                        result_g,this_no_start = apex_search(txt, 'champion', 'なりました', i , '9',fps,writer,match,debug_dir)
+                        result_g,this_no_start = apex_search(txt, 'champion', 'なりました', i , '9',fps,writer,match,debug_dir,['ランク','リーグ'])
                         result_h,this_no_start = apex_search(txt, 'kill', 'をノックダウン', i , '4',fps,writer,match,debug_dir)
                         # result_i,this_no_start = apex_search(txt, 'kill', 'ダメージ', i , '4',fps,writer,match,debug_dir)
                         result_j,this_no_start = apex_search(txt, 'blackhole', '重力の', i , '4',fps,writer,match,debug_dir)
