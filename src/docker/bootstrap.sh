@@ -492,54 +492,54 @@ if [ "$MODE" == 'match_clip_foreach' ]; then
                     echo "    -----------------------------------------"
 
 
-                    while read -r match
-                    do
-                    # for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
+                    # while read -r match
                     # do
+                    # # for match in $(find "${export_dir}" -maxdepth 1 -type d | grep match)
+                    # # do
                         
-                        count_movie_file=$(find /root/work -name "*.mp4" | grep -c .mp4 || true)
-                        if [ $count_movie_file -eq 0 ]; then
-                            echo "No movie file is exported. merge process is skipped."
-                            exit 0
-                        fi
-                        
-                        echo "      -----------------------------------------"
-                        echo "      start merge clips match $match"
-                        echo "      -----------------------------------------"
-                        merge_file="${match}"/merge.txt
-                        output_file="${OUT_PATH}/${filename}"_$(basename "$match")_merge.mp4
+                    count_movie_file=$(find /root/work -name "*.mp4" | grep -c .mp4 || true)
+                    if [ $count_movie_file -eq 0 ]; then
+                        echo "No movie file is exported. merge process is skipped."
+                        exit 0
+                    fi
+                    
+                    echo "      -----------------------------------------"
+                    echo "      start merge clips match $match"
+                    echo "      -----------------------------------------"
+                    merge_file="${match}"/merge.txt
+                    output_file="${OUT_PATH}/${filename}"_$(basename "$match")_merge.mp4
 
-                        if "$FORCE_PARAM" ; then
-                            echo "    apex-tracker: [FORCE] rm $merge_file, $output_file"
-                            rm -f "$merge_file"
-                            rm -f "$output_file"
-                        fi
+                    if "$FORCE_PARAM" ; then
+                        echo "    apex-tracker: [FORCE] rm $merge_file, $output_file"
+                        rm -f "$merge_file"
+                        rm -f "$output_file"
+                    fi
 
-                        : > "$merge_file"
+                    : > "$merge_file"
 
-                        echo "    apex-tracker: create merge_file: ${merge_file}"
-                        for in_file_number in $(find "${match}"/rec -type f -name '*battle*.mp4' | sed -e 's/.*battle//g' | sed -e 's/_.*//g' | sort -n)
-                        do
-                            in_file=$(find "${match}"/rec -type f -name "*battle${in_file_number}*")
-                            # in_file=$(ls "${match}/rec/*battle${in_file_number}*".mp4)
-                            echo "file '$in_file'" >> "$merge_file"
-                        done
+                    echo "    apex-tracker: create merge_file: ${merge_file}"
+                    for in_file_number in $(find "${match}"/rec -type f -name '*battle*.mp4' | sed -e 's/.*battle//g' | sed -e 's/_.*//g' | sort -n)
+                    do
+                        in_file=$(find "${match}"/rec -type f -name "*battle${in_file_number}*")
+                        # in_file=$(ls "${match}/rec/*battle${in_file_number}*".mp4)
+                        echo "file '$in_file'" >> "$merge_file"
+                    done
 
-                        echo "      Show ${merge_file} :"
-                        echo "      ----------------------------------------------"
-                        cat "$merge_file"
-                        echo "      ----------------------------------------------"
+                    echo "      Show ${merge_file} :"
+                    echo "      ----------------------------------------------"
+                    cat "$merge_file"
+                    echo "      ----------------------------------------------"
 
-                        echo "    apex-tracker: start merge clipped files : ${merge_file}"
-                        ffmpeg -y -f concat -safe 0 -i "$merge_file" -c copy "$output_file" </dev/null
-                        # ffmpeg -y -f concat -safe 0 -i $merge_file -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file </dev/null > /dev/null 2>&1
-                        echo "      ffmpeg -y -f concat -safe 0 -i \"$merge_file\" -c copy $output_file"
-                        echo "      -----------------------------------------"
-                        echo "      finish merge clips match $match"
-                        echo "      -----------------------------------------"
-                        rm -rf "${match}"/rec
+                    echo "    apex-tracker: start merge clipped files : ${merge_file}"
+                    ffmpeg -y -f concat -safe 0 -i "$merge_file" -c copy "$output_file" </dev/null
+                    # ffmpeg -y -f concat -safe 0 -i $merge_file -c copy -map 0:0 -map 0:1 -map 0:2 -map 0:3 $output_file </dev/null > /dev/null 2>&1
+                    echo "      ffmpeg -y -f concat -safe 0 -i \"$merge_file\" -c copy $output_file"
+                    echo "      -----------------------------------------"
+                    echo "      finish merge clips match $match"
+                    echo "      -----------------------------------------"
+                    rm -rf "${match}"/rec
                     # done
-                    done < <(find "${export_dir}" -maxdepth 1 -type d | grep match)
+                    # done < <(find "${export_dir}" -maxdepth 1 -type d | grep match)
                     # for match in `find ${export_dir} -maxdepth 1 -type d | grep match`
                     # do
                     #     rm -rf ${match}/rec
