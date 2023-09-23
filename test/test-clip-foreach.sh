@@ -55,7 +55,15 @@ cd ../test
 
 # ./test-action.sh
 
-export target=2023-09-15_22-30-35
+# export target=2023-09-15_22-30-35
+# export mode=match_clip_foreach
+# export audio=1
+# export expected_result=3
+# export debug=true
+
+# ./test-action.sh
+
+export target=2023-09-22_22-02-36
 export mode=match_clip_foreach
 export audio=1
 export expected_result=3

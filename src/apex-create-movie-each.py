@@ -37,7 +37,7 @@ parser.add_argument("--match", type=str,
 
 args = parser.parse_args()
 
-scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL','landing']
+scene_list=['result','memberlist','deathprotection','other','enemy','death','map','lobby','kill','champion','map','spectate','DARKEVIL','landing','startmatch']
 
 # 切り出し元動画パス
 src_movie = args.src
@@ -145,7 +145,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                 if int(match[i]) == match_num:
 
                     # 録画に含めたいシーンを指定[> 0:result / 1:memberlist / 2:deathprotection / 3:other / 4:enemy / 5:death / 8:kill / 9:champion
-                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 9 or int(scene[i]) == 10 or int(scene[i]) == 12 or int(scene[i]) == 13:
+                    if int(scene[i]) == 1 or int(scene[i]) == 2 or int(scene[i]) == 4 or int(scene[i]) == 8 or int(scene[i]) == 5 or int(scene[i]) == 0 or int(scene[i]) == 3 or int(scene[i]) == 9 or int(scene[i]) == 10 or int(scene[i]) == 12 or int(scene[i]) == 13 or int(scene[i]) == 14:
                         logger.debug("    Match target scene; i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
 
                         # matchの最初(start=-1)は、scene=0をスキップする
@@ -178,7 +178,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                                         current_time = sss[j]
 
                                     # 特徴点が連続している場合
-                                    if int(scene[j]) == 1 or int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 5 or int(scene[j]) == 3 or int(scene[j]) == 9 or int(scene[j]) == 10 or int(scene[j]) == 12:
+                                    if int(scene[j]) == 1 or int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 5 or int(scene[j]) == 3 or int(scene[j]) == 9 or int(scene[j]) == 10 or int(scene[j]) == 12 or int(scene[j]) == 13 or int(scene[j]) == 14:
                                         this_scene_list.append(int(scene[j]))
                                         # 特徴点が戦闘の場合
                                         if int(scene[j]) == 2 or int(scene[j]) == 4 or int(scene[j]) == 8 or int(scene[j]) == 12:
@@ -208,7 +208,7 @@ with open(battle_write_log_path, mode='w') as logfile:
                                             else:
                                                 logger.debug("            keep end_flg as True, [float(sss[j]) - float(before_time) > cut_duration_map => %s - %s > %s ] j = %s, end_flg = %s, end = %s, sss[j] = %s, current_time = %s, is_keep_this_loop = %s" % (sss[j],before_time, cut_duration_map, j, end_flg, end, sss[j], current_time, is_keep_this_loop))
                                         # 特徴点が降下中の場合
-                                        elif int(scene[j]) == 13:
+                                        elif int(scene[j]) == 13 or int(scene[j]) == 14:
                                             # 次の特徴点までの時間がcut_duration_battle秒以上空く場合
                                             if float(sss[j]) - float(before_time) > float(cut_duration_landing):
                                                 end = float(before_time)
@@ -269,8 +269,13 @@ with open(battle_write_log_path, mode='w') as logfile:
                                 # this_scene_listに入っているscene番号でduration_before,duration_afterを決定
 
                                 # 頻度の低いイベントから判定していく
+                                # マッチ開始の場合
+                                if 14 in this_scene_list:
+                                    duration_before = 3
+                                    duration_after = float(cut_duration_landing)
+                                    logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
                                 # 全滅かチャンピョンの場合のみ、battle_final_recを利用.
-                                if 5 in this_scene_list or 9 in this_scene_list or 0 in this_scene_list:
+                                elif 5 in this_scene_list or 9 in this_scene_list or 0 in this_scene_list:
                                     duration_before = battle_final_rec
                                     duration_after = death_after_sec
                                     logger.debug("        (%s scene) duration_before = %s, duration_after = %s" % (scene_list[int(scene[i])],duration_before,duration_after))
@@ -368,7 +373,8 @@ with open(battle_write_log_path, mode='w') as logfile:
                                 #logfile.write(log+'\n')
                             else:
                                 logger.debug("    Skip %s'th record (current is ahead of start), current = %s, i = %s, sec = %s, scene = %s" % (i,current, i,sss[i], scene[i]))
-
+                else:
+                    logger.debug("    Skip scene (the number 'match' is unmatch); i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
 
             # # csvファイルを一通り捜査した後の録画処理
             # if not start == -1:

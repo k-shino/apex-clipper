@@ -219,10 +219,23 @@ def main():
                         result_i,this_no_start = apex_search(txt, 'enemy', '着地', i , '4',fps,writer,match,debug_dir)
                         result_j,this_no_start = apex_search(txt, 'enemy', '敵の音', i , '4',fps,writer,match,debug_dir)
                         result_k,this_no_start = apex_search(txt, 'enemy', '音がする', i , '4',fps,writer,match,debug_dir)
+                        result_start_game,this_no_start = apex_search(txt, 'start', 'ゲームに参加', i , '14',fps,writer,match,debug_dir)
                         result = result_a or result_d or result_e or result_f or result_g or result_h or result_i or result_j or result_k
                         if result:
                             no_start = max(int(fps * skip_after_scan), no_start)
                             flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+
+                        # マッチ開始
+                        if result_start_game:
+                            flg_in_lobby ,flg_change_lobby = change_flg('lobby',flg_in_lobby,flg_change_lobby,False)
+                            flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,False)
+                            flg_in_result ,flg_change_result = change_flg('result',flg_in_result,flg_change_result,False)
+                            if not args.skipimage:
+                                out_path_image = os.path.join(
+                                    battle_dir, "start_match_%05d_%d.%02d.jpg" % (save_index,i/fps, 100 * (i % fps)/fps))
+                                cv2.imwrite(out_path_image,img)
+                            logger.info("[time: %4.1f] Start match [%s, match %s]" % (i/fps,basename, match))
+                            
                         # 敵を発見(ping)
                         if result_a or result_j or result_k:
                             flg_in_battle ,flg_change_battle = change_flg('battle',flg_in_battle,flg_change_battle,True)
