@@ -537,9 +537,9 @@ if [ "$MODE" == 'match_clip_foreach' ]; then
                         echo "      -----------------------------------------"
                         echo "      finish merge clips match $match"
                         echo "      -----------------------------------------"
+                        rm -rf "${match}"/rec
                     # done
                     done < <(find "${export_dir}" -maxdepth 1 -type d | grep match)
-                    rm -rf "${match}"/rec
                     # for match in `find ${export_dir} -maxdepth 1 -type d | grep match`
                     # do
                     #     rm -rf ${match}/rec
