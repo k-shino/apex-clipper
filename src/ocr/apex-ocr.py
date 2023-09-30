@@ -404,7 +404,7 @@ def main():
                         result_u,this_no_start = apex_search(txt, 'enemy', '弾でもくらいな', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ヒューズ)
                         result_v,this_no_start = apex_search(txt, 'enemy', '引き金を引くよ', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
                         result_va,this_no_start = apex_search(txt, 'enemy', '科学的に表現', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
-                        result_vb,this_no_start = apex_search(txt, 'enemy', '敵がいる', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
+                        result_vb,this_no_start = apex_search(txt, 'enemy', 'あそこに敵がいる', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
                         result_vc,this_no_start = apex_search(txt, 'enemy', 'すぐ近くに', i , '4',fps,writer,match,debug_dir) # 敵ダメージ(ホライゾン)
                         result_w,this_no_start = apex_search(txt, 'enemy', 'ダメージを受けている', i , '4',fps,writer,match,debug_dir) # 味方被弾(クリプト)
                         result_wa,this_no_start = apex_search(txt, 'enemy', 'ベールを', i , '4',fps,writer,match,debug_dir) # 戦術(シア)
@@ -432,7 +432,7 @@ def main():
                         result_pf_2,this_no_start = apex_search(txt, 'enemy', '割った', i , '4',fps,writer,match,debug_dir) # 敵発見(パスファインダー)
                         result_cl_1,this_no_start = apex_search(txt, 'enemy', 'フラグを', i , '4',fps,writer,match,debug_dir) # 攻撃(カタリスト)
                         # result_cl_2,this_no_start = apex_search(txt, 'enemy', 'シールドを回', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
-                        result_cl_3,this_no_start = apex_search(txt, 'enemy', '敵がい', i , '4',fps,writer,match,debug_dir) # 敵発見(カタリスト)
+                        result_cl_3,this_no_start = apex_search(txt, 'enemy', 'あそこに敵がい', i , '4',fps,writer,match,debug_dir) # 敵発見(カタリスト)
                         # result_cl_4,this_no_start = apex_search(txt, 'enemy', 'シールドをリ', i , '4',fps,writer,match,debug_dir) # 回復(カタリスト)
                         result_cl_5,this_no_start = apex_search(txt, 'enemy', 'シールドを砕', i , '4',fps,writer,match,debug_dir) # シールド破壊（カタリスト）
                         result_cl_ult_1,this_no_start = apex_search(txt, 'enemy', '鉄よ', i , '12',fps,writer,match,debug_dir) # カタリストULT
