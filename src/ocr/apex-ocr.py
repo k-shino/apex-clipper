@@ -211,7 +211,7 @@ def main():
                             apex_search(txt, 'top_right', '発見', i , '4',fps,writer,match,debug_dir)
                         result_a,this_no_start = apex_search(txt, 'enemy', '発見', i , '4',fps,writer,match,debug_dir)
                         result_c,this_no_start = apex_search(txt, 'result', '部隊の合計キル', i , '0',fps,writer,match,debug_dir)
-                        result_d,this_no_start = apex_search(txt, 'enemy', '敵の', i , '4',fps,writer,match,debug_dir)
+                        result_d,this_no_start = apex_search(txt, 'enemy', '敵の', i , '4',fps,writer,match,debug_dir,['最も近い','追跡','方向'])
                         result_e,this_no_start = apex_search(txt, 'enemy', 'シールドが', i , '4',fps,writer,match,debug_dir)
                         result_f,this_no_start = apex_search(txt, 'enemy', 'が割れた', i , '4',fps,writer,match,debug_dir)
                         result_g,this_no_start = apex_search(txt, 'enemy', '近くに', i , '4',fps,writer,match,debug_dir)
