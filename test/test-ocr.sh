@@ -28,13 +28,13 @@ cd ../test
 
 # ./test-action.sh
 
-# export target=switch2
-# export mode=ocr
-# export audio=0
-# export expected_result=0
-# export debug=true
+export target=switch2
+export mode=ocr
+export audio=0
+export expected_result=0
+export debug=true
 
-# ./test-action.sh
+./test-action.sh
 
 
 # export target=switch
@@ -45,11 +45,11 @@ cd ../test
 
 # ./test-action.sh
 
-export target=2023-09-22_22-02-36
-export mode=ocr
-export audio=0
-export expected_result=0
-export debug=false
-export skipimage=false
+# export target=2023-09-22_22-02-36
+# export mode=ocr
+# export audio=0
+# export expected_result=0
+# export debug=false
+# export skipimage=false
 
-./test-action.sh
+# ./test-action.sh
