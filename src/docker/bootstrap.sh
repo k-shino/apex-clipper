@@ -167,7 +167,7 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
         echo "$list"
         while read -r movie_file
         do
-            if [ -f "$file" ]; then
+            if [ -f "$movie_file" ]; then
                 echo "  Start OCR $movie_file : "
                 dir=$(basename "$movie_file" | awk -F. '{print $1}')
                 mkdir -p "${OCR_PATH}/${dir}"
