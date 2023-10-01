@@ -8,7 +8,6 @@ WORKDIR /tmp
 
 ADD ./model/ /root/model/
 ADD ./apex-tracker.py /root/
-ADD ./apex-create-movie.py /root/
 ADD ./apex-create-movie-each.py /root/
 ADD ./docker/bootstrap.sh /root/
 ADD ./ocr/apex-ocr.py /root/
