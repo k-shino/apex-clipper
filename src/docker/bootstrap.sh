@@ -167,81 +167,83 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'ocr' ]; then
         echo "$list"
         while read -r movie_file
         do
-            echo "  Start OCR $movie_file : "
-            dir=$(basename "$movie_file" | awk -F. '{print $1}')
-            mkdir -p "${OCR_PATH}/${dir}"
-            flg_ocr_in_progress=${OCR_PATH}/${dir}/flg_in_progress
+            if [ -f "$file" ]; then
+                echo "  Start OCR $movie_file : "
+                dir=$(basename "$movie_file" | awk -F. '{print $1}')
+                mkdir -p "${OCR_PATH}/${dir}"
+                flg_ocr_in_progress=${OCR_PATH}/${dir}/flg_in_progress
 
-            if "$FORCE_PARAM"; then
-                if [ -f "${OCR_PATH}/${dir}/${FINISH_FLG}" ]; then
-                    if [ "$(cat "${OCR_PATH}/${dir}/${FINISH_FLG}")" != "$VERSION" ]; then
-                        echo "Force OCR: ${OCR_PATH}/${dir}"
-                        rm -f "${OCR_PATH}/${dir}/${FINISH_FLG}"
+                if "$FORCE_PARAM"; then
+                    if [ -f "${OCR_PATH}/${dir}/${FINISH_FLG}" ]; then
+                        if [ "$(cat "${OCR_PATH}/${dir}/${FINISH_FLG}")" != "$VERSION" ]; then
+                            echo "Force OCR: ${OCR_PATH}/${dir}"
+                            rm -f "${OCR_PATH}/${dir}/${FINISH_FLG}"
+                        fi
                     fi
                 fi
-            fi
-            
-            # ocrが終わっていない場合の処理
-            if [ ! -f "${OCR_PATH}/${dir}/${FINISH_FLG}" ]; then
-                # file_sizeに${movie_file}のファイルサイズを保存する。
-                file_size=$(ls -al ${movie_file} | awk '{print $5}')
+                
+                # ocrが終わっていない場合の処理
+                if [ ! -f "${OCR_PATH}/${dir}/${FINISH_FLG}" ]; then
+                    # file_sizeに${movie_file}のファイルサイズを保存する。
+                    file_size=$(ls -al ${movie_file} | awk '{print $5}')
 
-                # このファイルサイズが、次回以降のループ時に不一致になった場合、$flg_ocr_in_progressを削除する
-                if [ -f "$flg_ocr_in_progress" ]; then
-                    if [ "$(cat "$flg_ocr_in_progress")" != "$file_size" ]; then
-                        echo "  apex-tracker: rm ${flg_ocr_in_progress} [may video files has'nt finalized yet] (file_size=${file_size}, flg_ocr_in_progress=$(cat "${flg_ocr_in_progress}"))"
-                        rm -f "$flg_ocr_in_progress"
-                    fi
-                fi
-
-                # flg_in_progressがある場合はskipする
-                if [ ! -f "${flg_ocr_in_progress}" ]; then
-                    # rm -rf ${OCR_PATH}/${dir}/match*/
-                    rm -f "${OCR_PATH}/${dir}"/flg_*
-                    rm -f "${OCR_PATH}/${dir}"/*flg*
-                    ls -al ${movie_file} | awk '{print $5}' > "$flg_ocr_in_progress"
-
-                    EXEC_OCR="python3 /root/apex-ocr.py -o \"${OCR_PATH}\""
-                    EXEC_ARGS=""
-
-                    if [ -n "$SKIP" ]; then
-                        EXEC_ARGS="$EXEC_ARGS --skip $SKIP"
+                    # このファイルサイズが、次回以降のループ時に不一致になった場合、$flg_ocr_in_progressを削除する
+                    if [ -f "$flg_ocr_in_progress" ]; then
+                        if [ "$(cat "$flg_ocr_in_progress")" != "$file_size" ]; then
+                            echo "  apex-tracker: rm ${flg_ocr_in_progress} [may video files has'nt finalized yet] (file_size=${file_size}, flg_ocr_in_progress=$(cat "${flg_ocr_in_progress}"))"
+                            rm -f "$flg_ocr_in_progress"
+                        fi
                     fi
 
-                    if "$DEBUG_MODE"; then
-                        EXEC_ARGS="$EXEC_ARGS --debug"
-                    fi
+                    # flg_in_progressがある場合はskipする
+                    if [ ! -f "${flg_ocr_in_progress}" ]; then
+                        # rm -rf ${OCR_PATH}/${dir}/match*/
+                        rm -f "${OCR_PATH}/${dir}"/flg_*
+                        rm -f "${OCR_PATH}/${dir}"/*flg*
+                        ls -al ${movie_file} | awk '{print $5}' > "$flg_ocr_in_progress"
 
-                    if "$SKIP_IMAGE_EXPORT"; then
-                        EXEC_ARGS="$EXEC_ARGS --skipimage"
-                    fi
+                        EXEC_OCR="python3 /root/apex-ocr.py -o \"${OCR_PATH}\""
+                        EXEC_ARGS=""
 
-                    echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
-                    if ! eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\"";
-                    then
-                        touch "${OCR_PATH}/${dir}"/file_error
-                        rm -f "$flg_ocr_in_progress"
-                        # exit 1
-                    fi
+                        if [ -n "$SKIP" ]; then
+                            EXEC_ARGS="$EXEC_ARGS --skip $SKIP"
+                        fi
 
-                    if [ -s "${OCR_PATH}/${dir}/${csv_file}" ]; then
-                        echo $VERSION > "${OCR_PATH}/${dir}/${FINISH_FLG}"
-                        echo "    Finish OCR ${OCR_PATH}/${dir}"
-                        rm -f "$flg_ocr_in_progress"
+                        if "$DEBUG_MODE"; then
+                            EXEC_ARGS="$EXEC_ARGS --debug"
+                        fi
 
-                        # ${OCR_PATH}/${dir}の中に、flg_in_progress_matchがある場合、削除し、ocr_finishedファイルを作成する
-                        for match in $(find "${OCR_PATH}/${dir}" -maxdepth 1 -type d | grep match)
-                        do
-                            rm -f "${match}"/flg_in_progress_match
-                            touch "${match}"/ocr_finished
-                        done
+                        if "$SKIP_IMAGE_EXPORT"; then
+                            EXEC_ARGS="$EXEC_ARGS --skipimage"
+                        fi
+
+                        echo "    exec: $EXEC_OCR $EXEC_ARGS ${movie_file}"
+                        if ! eval "$EXEC_OCR $EXEC_ARGS \"${movie_file}\"";
+                        then
+                            touch "${OCR_PATH}/${dir}"/file_error
+                            rm -f "$flg_ocr_in_progress"
+                            # exit 1
+                        fi
+
+                        if [ -s "${OCR_PATH}/${dir}/${csv_file}" ]; then
+                            echo $VERSION > "${OCR_PATH}/${dir}/${FINISH_FLG}"
+                            echo "    Finish OCR ${OCR_PATH}/${dir}"
+                            rm -f "$flg_ocr_in_progress"
+
+                            # ${OCR_PATH}/${dir}の中に、flg_in_progress_matchがある場合、削除し、ocr_finishedファイルを作成する
+                            for match in $(find "${OCR_PATH}/${dir}" -maxdepth 1 -type d | grep match)
+                            do
+                                rm -f "${match}"/flg_in_progress_match
+                                touch "${match}"/ocr_finished
+                            done
+                        fi
+                    else
+                        echo "    Another OCR process running for ${OCR_PATH}/${dir} (work_in_progress flag)"
                     fi
+                # ocrが終わっていた場合はSkip
                 else
-                    echo "    Another OCR process running for ${OCR_PATH}/${dir} (work_in_progress flag)"
+                    echo "    Skip OCR ${OCR_PATH}/${dir}"
                 fi
-            # ocrが終わっていた場合はSkip
-            else
-                echo "    Skip OCR ${OCR_PATH}/${dir}"
             fi
         done < <(echo "$list")
     done
