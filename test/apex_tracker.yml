@@ -14,6 +14,7 @@ services:
       - DEBUG_MODE=<debug>
       - IS_START_DELAY=<delay>
       - SKIP_IMAGE_EXPORT=<skipimage>
+      - DRY_RUN_MODE=<dryrun>
     deploy:
       mode: replicated
       replicas: <replica>

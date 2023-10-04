@@ -63,10 +63,12 @@ cd ../test
 
 # ./test-action.sh
 
-export target=2023-09-22_22-02-36
+export target=2023-09-29_22-11-45
 export mode=match_clip_foreach
 export audio=1
 export expected_result=3
 export debug=true
+export dryrun=false
+export match_num=2
 
 ./test-action.sh

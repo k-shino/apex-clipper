@@ -8,6 +8,7 @@ mode=${mode:-ocr}
 audio=${audio:-1}
 expected_result=${expected_result:-1}
 debug=${debug:-false}
+dryrun=${dryrun:-false}
 ocr_in_progress=${ocr_in_progress:-false}
 skipimage=${skipimage:-false}
 
@@ -28,6 +29,10 @@ cp "../orig/${target}.mp4" orig/${dummy_date}.mp4
 if [ "$mode" == "match_clip" ]|| [ "$mode" == "match_clip_foreach" ] || [ "$mode" == "kill_clip" ]; then
     cp -r "../ocr/${target}" ./ocr/${dummy_date}
 
+    if [ -n "$match_num" ]; then
+        rm -f ./ocr/${dummy_date}/match${match_num}/flg_create_clip_finished
+    fi
+
     if "$ocr_in_progress"; then
         for dir in match1 match2
         do
@@ -45,6 +50,7 @@ sed -i -e "s/<image-tag>/apex-clipper:local/" apex_tracker_tmp.yml
 sed -i -e "s/<mode>/${mode}/" apex_tracker_tmp.yml
 sed -i -e "s/<audio>/${audio}/" apex_tracker_tmp.yml
 sed -i -e "s/<debug>/${debug}/" apex_tracker_tmp.yml
+sed -i -e "s/<dryrun>/${dryrun}/" apex_tracker_tmp.yml
 sed -i -e "s/<delay>/false/" apex_tracker_tmp.yml
 sed -i -e "s/<replica>/1/" apex_tracker_tmp.yml
 sed -i -e "s/<skipimage>/${skipimage}/" apex_tracker_tmp.yml

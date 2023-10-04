@@ -15,6 +15,7 @@ export csv_file=${csv_file:-cut_time_battle.csv}
 export MODE=${MODE:-all}
 export FORCE_PARAM=false
 export DEBUG_MODE=${DEBUG_MODE:-false}
+export DRY_RUN_MODE=${DRY_RUN_MODE:-false}
 export SKIP_IMAGE_EXPORT=${SKIP_IMAGE_EXPORT:-false}
 
 export IS_START_DELAY=${IS_START_DELAY:-true}
@@ -60,6 +61,10 @@ do
             ;;
         '--debug' )
             DEBUG_MODE=true
+            shift 1
+            ;;
+        '--dryrun' )
+            DRY_RUN_MODE=true
             shift 1
             ;;
         '--imageexport' )
@@ -322,6 +327,10 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ] || [ "$MODE" == 'match_cl
                         EXEC_ARGS="$EXEC_ARGS --debug"
                     fi
 
+                    if "$DRY_RUN_MODE"; then
+                        EXEC_ARGS="$EXEC_ARGS --dryrun"
+                    fi
+
                     echo "    -----------------------------------------"
                     echo "    exec: $EXEC_OCR $EXEC_ARGS"
                     echo "    -----------------------------------------"
@@ -364,10 +373,12 @@ if [ "$MODE" == 'all' ] || [ "$MODE" == 'match_clip' ] || [ "$MODE" == 'match_cl
 
                     : > "$merge_file"
 
+
                     echo "    apex-tracker: create merge_file: ${merge_file}"
-                    for in_file_number in $(find "${match}"/rec -type f -name '*battle*.mp4' | sed -e 's/.*battle//g' | sed -e 's/_.*//g' | sort -n)
+                    # for in_file_number in $(find "${match}"/rec -type f -name '*battle*.mp4' | sed -e 's/.*battle//g' | sed -e 's/_.*//g' | sort -n)
+                    for in_file_number in $(find "${export_dir}/match${MATCH_NUM}/rec" -type f -name '*battle*.mp4' | sed -e 's/.*battle//g' | sed -e 's/_.*//g' | sort -n)
                     do
-                        in_file=$(find "${match}"/rec -type f -name "*battle${in_file_number}*")
+                        in_file=$(find "${export_dir}/match${MATCH_NUM}/rec" -type f -name "*battle${in_file_number}*")
                         # in_file=$(ls "${match}/rec/*battle${in_file_number}*".mp4)
                         echo "file '$in_file'" >> "$merge_file"
                     done
