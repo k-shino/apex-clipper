@@ -8,9 +8,11 @@ mode=${mode:-ocr}
 audio=${audio:-1}
 expected_result=${expected_result:-1}
 debug=${debug:-false}
+clean=${clean:-true}
 dryrun=${dryrun:-false}
 ocr_in_progress=${ocr_in_progress:-false}
 skipimage=${skipimage:-false}
+match_num=${match_num:-}
 
 dummy_date="2023-08-01_10-00-00"
 
@@ -20,16 +22,22 @@ dummy_date="2023-08-01_10-00-00"
 
 cd ../test
 
-rm -rf ${tmpdir}
+if "$clean"; then
+    rm -rf ${tmpdir}
+fi
 mkdir -p ${tmpdir}
 cd ${tmpdir}
 mkdir -p orig out ocr work apex_kill_clip
-cp "../orig/${target}.mp4" orig/${dummy_date}.mp4
+if "$clean"; then
+    cp "../orig/${target}.mp4" orig/${dummy_date}.mp4
+fi
 
 if [ "$mode" == "match_clip" ]|| [ "$mode" == "match_clip_foreach" ] || [ "$mode" == "kill_clip" ]; then
-    cp -r "../ocr/${target}" ./ocr/${dummy_date}
+    if "$clean"; then
+        cp -r "../ocr/${target}" ./ocr/${dummy_date}
+    fi
 
-    if [ -n "$match_num" ]; then
+    if [ -n "${match_num}" ]; then
         rm -f ./ocr/${dummy_date}/match${match_num}/flg_create_clip_finished
     fi
 

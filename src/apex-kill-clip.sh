@@ -94,7 +94,7 @@ do
             mode=$2
             shift 2
             ;;
-        '--dry-run' )
+        '--dryrun' )
             DRY_RUN=true
             shift 1
             ;;
@@ -388,10 +388,10 @@ while read row; do
 
         this_basefilename=$(basename "$last_src_file" | awk -F[.] '{print $1}')_${this_start_time}_${rec}
 
-        for file in $(find ${export_csv_local_dir} -name "*${this_basefilename}.mp4");
-        do
-            rm -f "$file"
-        done
+        # for file in $(find ${export_csv_local_dir} -name "*${this_basefilename}.mp4");
+        # do
+        #     rm -f "$file"
+        # done
 
         # type=knockが最終抽出点の場合，録画時間を10秒延長する
         if [ "$last_type" = "knock" ]; then
@@ -402,8 +402,13 @@ while read row; do
             this_save_file=${export_csv_local_dir}/${this_unix_time}_${last_type}_killfinish_${this_basefilename}.mp4
         fi
 
+        if "${DRY_RUN}"; then
+            this_duration=2
+        fi
 
-        if [ $(find "${export_csv_local_dir}" -name "${this_unix_time}_*" | wc -l) -eq 0 ] && [ $(find "${export_csv_local_dir}" -name "*_${this_basefilename}.mp4" | wc -l) -eq 0 ] && [ ! -f "${this_save_file}" ]; then
+        is_exist=$(find "${export_csv_local_dir}" -name "${this_unix_time}_${last_type}*.mp4")
+
+        if [ -z "${is_exist}" ]; then
             echo "      Exec: kill_clip $last_src_file $this_start_time $this_duration $this_save_file"
             echo "      Exec: kill_clip $last_src_file $this_start_time $this_duration $this_save_file" >> "${export_csv_dir}/${log}"
             echo "kill_clip $last_src_file $this_start_time $this_duration $this_save_file" >> "${ffmpeg_command}"
@@ -485,7 +490,14 @@ else
 fi
 
 
+
+
 is_exist=$(find "${export_csv_local_dir}" -name "${this_filename}")
+
+if "${DRY_RUN}"; then
+    this_duration=2
+fi
+
 
 if [ -z "${is_exist}" ]; then
     echo "      Exec: kill_clip $last_src_file $this_start_time $this_duration $this_save_file"
@@ -519,8 +531,8 @@ AUDIO_ARGS=""
 
 # 配列の要素を表示
 for element in "${elements[@]}"; do
-    echo "$element"
-    echo " -map 0:a:${element}"
+    echo "element: $element"
+    echo "opt: -map 0:a:${element}"
     AUDIO_ARGS=" -map 0:a:${element} ${AUDIO_ARGS}"
 done
 IFS=$OLDIFS

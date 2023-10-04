@@ -444,6 +444,10 @@ if [ $MODE == 'all' ] || [ $MODE == 'kill_clip' ]; then
         EXEC_KILL_CLIP_ARGS=" --revert"
     fi
 
+    if "$DRY_RUN_MODE"; then
+        EXEC_KILL_CLIP_ARGS=" --dryrun"
+    fi
+
     echo "$EXEC_KILL_CLIP $EXEC_KILL_CLIP_ARGS"
     eval "$EXEC_KILL_CLIP $EXEC_KILL_CLIP_ARGS"
 
