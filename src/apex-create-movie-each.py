@@ -233,6 +233,10 @@ with open(battle_write_log_path, mode='w') as logfile:
                                         end_flg=True
                                         logger.debug("          Keep this j loop(next scene is same second): sss[%s] = %s, sss[%s+1] = %s" % (j, sss[j], j, sss[j+1]))
 
+                                    if len(sss) - j == 1:
+                                        end = float(before_time)
+                                        end_flg=False
+
                                     if not end_flg:
                                         logger.debug("          Finished loop: end = %s, sss[%s-1] = %s, sss[%s] = %s, end_flg = %s" % (end, j, sss[j-1], j, sss[j], end_flg))
                                     else:
