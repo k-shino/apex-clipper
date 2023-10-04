@@ -10,6 +10,7 @@ from logging import StreamHandler, FileHandler, Formatter
 from logging import INFO, DEBUG, NOTSET
 import argparse
 import shutil
+import sys
 parser = argparse.ArgumentParser()
 parser.add_argument("src", type=str,
                     help="Target file")
@@ -142,7 +143,7 @@ with open(battle_write_log_path, mode='w') as logfile:
 
             for i in tqdm(range(len(sss))):
 
-                logger.debug("  loop %s of %s" % (i, len(sss)))
+                logger.debug("  loop %s of %s (i = %s, sec = %s, scene = %s)" % (i, len(sss), i,sss[i], scene[i]))
 
                 if int(match[i]) == match_num:
 
@@ -383,6 +384,10 @@ with open(battle_write_log_path, mode='w') as logfile:
                                 #logfile.write(log+'\n')
                             else:
                                 logger.debug("    Skip %s'th record (current is ahead of start), current = %s, i = %s, sec = %s, scene = %s" % (i,current, i,sss[i], scene[i]))
+                    elif int(scene[i]) == 7:
+                        logger.debug("    Finish clip (back to lobby); i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
+                        logfile.close
+                        sys.exit(0)
                 else:
                     logger.debug("    Skip scene (the number 'match' is unmatch); i = %s, sec = %s, scene = %s" % (i,sss[i], scene[i]))
 

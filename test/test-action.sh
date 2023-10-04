@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 tmpdir=${tmpdir:-tmp}
 target=${target:-clip}
